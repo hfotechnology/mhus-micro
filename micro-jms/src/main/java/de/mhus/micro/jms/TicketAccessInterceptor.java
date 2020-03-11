@@ -1,0 +1,103 @@
+/**
+ * Copyright 2018 Mike Hummel
+ *
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
+ *
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.mhus.micro.jms;
+
+import java.util.Locale;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+
+import de.mhus.lib.core.M;
+import de.mhus.lib.core.MConstants;
+import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.cfg.CfgBoolean;
+import de.mhus.lib.core.security.AaaContext;
+import de.mhus.lib.core.security.AccessApi;
+import de.mhus.lib.errors.AccessDeniedException;
+import de.mhus.lib.errors.MRuntimeException;
+import de.mhus.lib.jms.JmsInterceptor;
+import de.mhus.micro.core.api.JmsApi;
+
+public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
+
+    //	public static final CfgString TICKET_KEY = new CfgString(JmsApi.class, "aaaTicketParameter",
+    // "mhus.ticket");
+    //	public static final CfgString LOCALE_KEY = new CfgString(JmsApi.class, "aaaLocaleParameter",
+    // "mhus.locale");
+    public static final CfgBoolean RELAXED = new CfgBoolean(JmsApi.class, "aaaRelaxed", true);
+
+    @Override
+    public void begin(Message message) {
+        String ticket;
+        try {
+            ticket = message.getStringProperty(JmsApi.PARAM_AAA_TICKET);
+        } catch (JMSException e) {
+            throw new MRuntimeException(e);
+        }
+        try {
+            AccessApi api = M.l(AccessApi.class);
+            if (api == null) {
+                if (RELAXED.value()) return;
+                else throw new AccessDeniedException("access api not found");
+            }
+            String localeStr = message.getStringProperty(JmsApi.PARAM_LOCALE);
+            Locale locale = localeStr == null ? null : Locale.forLanguageTag(localeStr);
+            if (ticket == null) api.process(api.getGuestAccount(), null, false, locale);
+            else api.process(ticket, locale);
+        } catch (Throwable t) {
+            log().d("Incoming Access Denied", message);
+            throw new RuntimeException(t);
+        }
+    }
+
+    @Override
+    public void end(Message message) {
+
+        AccessApi api = M.l(AccessApi.class);
+        if (api == null) return;
+
+        String ticket;
+        try {
+            ticket = message.getStringProperty(JmsApi.PARAM_AAA_TICKET);
+        } catch (JMSException e) {
+            throw new MRuntimeException(e);
+        }
+        if (ticket == null) M.l(AccessApi.class).release(api.getGuestContext());
+        else M.l(AccessApi.class).release(ticket);
+    }
+
+    @Override
+    public void prepare(Message message) {
+
+        AccessApi api = M.l(AccessApi.class);
+        if (api == null) return;
+
+        AaaContext current = api.getCurrent();
+        if (current == null) return;
+
+        String ticket = api.createTrustTicket(JmsApi.TRUST_NAME.value(), current);
+        Locale l = current.getLocale();
+        if (l == null) l = Locale.getDefault();
+        String locale = l.toString();
+        try {
+            message.setStringProperty(JmsApi.PARAM_AAA_TICKET, ticket);
+            message.setStringProperty(JmsApi.PARAM_LOCALE, locale);
+        } catch (JMSException e) {
+            throw new MRuntimeException(e);
+        }
+    }
+
+    @Override
+    public void answer(Message message) {}
+}
