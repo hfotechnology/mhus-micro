@@ -19,7 +19,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 
 import de.mhus.lib.core.M;
-import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.security.AaaContext;

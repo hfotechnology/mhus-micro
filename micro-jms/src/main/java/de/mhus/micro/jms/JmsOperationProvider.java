@@ -37,7 +37,6 @@ import org.osgi.service.component.annotations.Deactivate;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
-import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MDate;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPeriod;
