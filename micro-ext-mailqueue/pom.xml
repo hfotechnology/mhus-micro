@@ -30,7 +30,7 @@
 	<build>
 		<plugins>
                 <plugin>
-                    <groupId>de.mhus.lib</groupId>
+                    <groupId>de.mhus.mvn.plugin</groupId>
                     <artifactId>constgenerator-maven-plugin</artifactId>
                 </plugin>
 			<plugin>
