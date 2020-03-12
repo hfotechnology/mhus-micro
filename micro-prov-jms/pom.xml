@@ -19,7 +19,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>micro-karaf</artifactId>
+	<artifactId>micro-prov-jms</artifactId>
 	<packaging>bundle</packaging>
 	<parent>
 		<groupId>de.mhus.micro</groupId>
@@ -38,13 +38,13 @@
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Export-Package>
-							de.mhus.micro.karaf.*;version=${project.version}
+							de.mhus.micro.prov.jms.*;version=${project.version}
 						</Export-Package>
 						<Import-Package>
-						  *;resolution:=optional
+						  *
 						</Import-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
-						<Service-Component>de.mhus.micro.karaf.*</Service-Component>
+						<Service-Component>de.mhus.micro.prov.jms.*</Service-Component>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -111,6 +111,10 @@
 			<groupId>de.mhus.lib</groupId>
 			<artifactId>lib-core</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>de.mhus.lib</groupId>
+            <artifactId>lib-jms</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
@@ -120,12 +124,12 @@
             <artifactId>org.osgi.compendium</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.karaf.shell</groupId>
-            <artifactId>org.apache.karaf.shell.console</artifactId>
+            <groupId>de.mhus.osgi</groupId>
+            <artifactId>osgi-api</artifactId>
         </dependency>
         <dependency>
             <groupId>de.mhus.osgi</groupId>
-            <artifactId>osgi-api</artifactId>
+            <artifactId>osgi-jms</artifactId>
         </dependency>
 
         <dependency>
@@ -135,20 +139,6 @@
         <dependency>
             <groupId>de.mhus.micro</groupId>
             <artifactId>micro-osgi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.mhus.micro</groupId>
-            <artifactId>micro-ext-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.mhus.micro</groupId>
-            <artifactId>micro-ext-dfs</artifactId>
-            <version>${mhus-micro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>de.mhus.micro</groupId>
-            <artifactId>micro-ext-mailqueue</artifactId>
-            <version>${mhus-micro.version}</version>
         </dependency>
 
         

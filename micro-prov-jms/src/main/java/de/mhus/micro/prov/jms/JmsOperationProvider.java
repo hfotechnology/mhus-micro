@@ -11,7 +11,7 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.micro.jms;
+package de.mhus.micro.prov.jms;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -59,7 +59,7 @@ import de.mhus.micro.core.api.OperationAddress;
 import de.mhus.micro.core.api.OperationDescriptor;
 import de.mhus.micro.core.api.OperationUtil;
 import de.mhus.micro.core.api.OperationsProvider;
-import de.mhus.micro.jms.JmsApiImpl.JmsOperationDescriptor;
+import de.mhus.micro.prov.jms.JmsApiImpl.JmsOperationDescriptor;
 import de.mhus.osgi.api.jms.JmsUtil;
 
 /**

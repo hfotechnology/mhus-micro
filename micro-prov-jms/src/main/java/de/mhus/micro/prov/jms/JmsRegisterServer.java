@@ -11,7 +11,7 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.micro.jms;
+package de.mhus.micro.prov.jms;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ import de.mhus.lib.jms.JmsDestination;
 import de.mhus.lib.jms.ServerJms;
 import de.mhus.micro.core.api.JmsApi;
 import de.mhus.micro.core.api.OperationAddress;
-import de.mhus.micro.jms.JmsApiImpl.JmsOperationDescriptor;
+import de.mhus.micro.prov.jms.JmsApiImpl.JmsOperationDescriptor;
 import de.mhus.osgi.api.jms.JmsDataChannel;
 import de.mhus.osgi.jms.services.AbstractJmsDataChannel;
 

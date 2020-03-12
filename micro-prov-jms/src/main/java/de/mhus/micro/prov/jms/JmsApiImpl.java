@@ -11,7 +11,7 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.mhus.micro.jms;
+package de.mhus.micro.prov.jms;
 
 import java.util.Collection;
 import java.util.HashMap;

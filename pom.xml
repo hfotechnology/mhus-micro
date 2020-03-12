@@ -62,7 +62,10 @@
 	<modules>
         <module>micro-core</module>
         <module>micro-osgi</module>
-        <module>micro-jms</module>
+        <module>micro-prov-jms</module>
+        <module>micro-ext-api</module>
+        <module>micro-ext-dfs</module>
+        <module>micro-ext-mailqueue</module>
         <module>micro-karaf</module>
      </modules>
 
