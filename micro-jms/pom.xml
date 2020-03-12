@@ -105,15 +105,15 @@
 	<dependencies>
 		<dependency>
 			<groupId>de.mhus.lib</groupId>
-			<artifactId>mhu-lib-annotations</artifactId>
+			<artifactId>lib-annotations</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>de.mhus.lib</groupId>
-			<artifactId>mhu-lib-core</artifactId>
+			<artifactId>lib-core</artifactId>
 		</dependency>
         <dependency>
             <groupId>de.mhus.lib</groupId>
-            <artifactId>mhu-lib-jms</artifactId>
+            <artifactId>lib-jms</artifactId>
         </dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>
@@ -125,11 +125,11 @@
         </dependency>
         <dependency>
             <groupId>de.mhus.osgi</groupId>
-            <artifactId>mhu-osgi-api</artifactId>
+            <artifactId>osgi-api</artifactId>
         </dependency>
         <dependency>
             <groupId>de.mhus.osgi</groupId>
-            <artifactId>mhu-osgi-jms</artifactId>
+            <artifactId>osgi-jms</artifactId>
         </dependency>
 
         <dependency>
