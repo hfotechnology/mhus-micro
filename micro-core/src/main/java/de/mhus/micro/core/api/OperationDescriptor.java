@@ -40,29 +40,25 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
     private Collection<String> tags;
     private OperationAddress address;
     private OperationDescription description;
-    private String acl;
     private UUID uuid;
 
     public OperationDescriptor(
             UUID uuid,
             String address,
             OperationDescription description,
-            Collection<String> tags,
-            String acl) {
-        this(uuid, new OperationAddress(address), description, tags, acl);
+            Collection<String> tags) {
+        this(uuid, new OperationAddress(address), description, tags);
     }
 
     public OperationDescriptor(
             UUID uuid,
             OperationAddress address,
             OperationDescription description,
-            Collection<String> tags,
-            String acl) {
+            Collection<String> tags) {
         this.uuid = uuid;
         this.address = address;
         this.description = description;
         this.tags = tags;
-        this.acl = acl;
 
         // tags from description
         Object tagsStr =
@@ -181,10 +177,6 @@ public class OperationDescriptor implements MNlsProvider, Nls, Named, Versioned 
         HashMap<String, String> p = description.getParameters();
         if (p == null) return null;
         return p.get(key);
-    }
-
-    public String getAcl() {
-        return acl;
     }
 
     public UUID getUuid() {

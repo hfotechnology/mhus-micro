@@ -108,7 +108,6 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
                                 String tags = m.getString("tags" + cnt);
                                 String title = m.getString("title" + cnt);
                                 String form = m.getString("form" + cnt);
-                                String acl = m.getString("acl" + cnt);
                                 UUID uuid = UUID.fromString(m.getString("uuid" + cnt));
                                 DefRoot model = null;
                                 if (form != null) {
@@ -165,8 +164,7 @@ public class JmsRegisterServer extends AbstractJmsDataChannel {
                                                     tags == null
                                                             ? null
                                                             : MCollection.toTreeSet(
-                                                                    tags.split(";")),
-                                                    acl);
+                                                                    tags.split(";")));
                                     JmsApiImpl.instance.register.put(ident, desc);
                                 }
                                 desc.setLastUpdated();

@@ -25,17 +25,14 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import de.mhus.lib.core.IProperties;
-import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.base.service.IdentUtil;
-import de.mhus.lib.core.security.AccessApi;
+import de.mhus.lib.core.shiro.ShiroUtil;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.Operation;
@@ -74,9 +71,6 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
         instance = null;
         context = null;
     }
-
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
-    public void getAccessApi(AccessApi api) {}
 
     private class MyServiceTrackerCustomizer
             implements ServiceTrackerCustomizer<Operation, Operation> {
@@ -126,27 +120,13 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
             tags.add(OperationDescriptor.TAG_HOST + "=localhost");
             tags.add(OperationDescription.TAG_TECH + "=" + OperationDescription.TECH_JAVA);
 
-            String acl = OperationUtil.getOption(tags, OperationDescriptor.TAG_DEFAULT_ACL, "");
-            try {
-                AccessApi aaa = M.l(AccessApi.class);
-                if (aaa != null)
-                    acl =
-                            aaa.getResourceAccessAcl(
-                                    aaa.getCurrentAccount(),
-                                    "local.operation",
-                                    desc.getPath(),
-                                    "execute",
-                                    acl);
-                else log().w("AccessApi not found", desc, acl);
-            } catch (Throwable t) {
-                log().e(t);
-            }
+            // String acl = OperationUtil.getOption(tags, OperationDescriptor.TAG_DEFAULT_ACL, "");
+            
             return new LocalOperationDescriptor(
                     service.getUuid(),
                     OperationAddress.create(PROVIDER_NAME, desc),
                     desc,
                     tags,
-                    acl,
                     service);
         }
 
@@ -233,21 +213,8 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
         }
         if (operation == null) throw new NotFoundException("operation not found", desc);
 
-        AccessApi aaa = M.l(AccessApi.class);
-        if (aaa != null) {
-            try {
-                String acl =
-                        OperationUtil.getOption(
-                                desc.getTags(), OperationDescriptor.TAG_DEFAULT_ACL, "");
-                if (!aaa.hasResourceAccess(
-                        aaa.getCurrentAccount(), "local.operation", desc.getPath(), "execute", acl))
-                    throw new AccessDeniedException("access denied", desc.getPath());
-            } catch (AccessDeniedException e) {
-                throw e;
-            } catch (Throwable t) {
-                throw new AccessDeniedException("internal error", t);
-            }
-        } else throw new AccessDeniedException("Access api not found");
+        if (!ShiroUtil.checkPermission("local.operation:execute:" + desc.getPath()))
+            throw new AccessDeniedException("access denied", desc.getPath());
 
         DefaultTaskContext taskContext = new DefaultTaskContext(getClass());
         taskContext.setParameters(properties);
@@ -293,9 +260,8 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
                 OperationAddress address,
                 OperationDescription description,
                 Collection<String> tags,
-                String acl,
                 Operation operation) {
-            super(uuid, address, description, tags, acl);
+            super(uuid, address, description, tags);
             this.operation = operation;
         }
 

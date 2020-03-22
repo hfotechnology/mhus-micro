@@ -89,7 +89,6 @@ public class JmsApiImpl extends MLog implements JmsApi {
                                     + "="
                                     + M.l(ServerIdent.class).toString();
                     msg.setString("tags" + cnt, tags);
-                    msg.setString("acl" + cnt, desc.getAcl());
                     msg.setString("title" + cnt, desc.getTitle());
                     msg.setString("uuid" + cnt, desc.getUuid().toString());
                     for (String key : desc.getParameterKeys()) {
@@ -154,9 +153,8 @@ public class JmsApiImpl extends MLog implements JmsApi {
                 UUID uuid,
                 OperationAddress address,
                 OperationDescription description,
-                Collection<String> tags,
-                String acl) {
-            super(uuid, address, description, tags, acl);
+                Collection<String> tags) {
+            super(uuid, address, description, tags);
         }
 
         public long getLastUpdated() {

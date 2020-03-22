@@ -18,12 +18,16 @@ import java.util.Locale;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
+import org.apache.shiro.subject.Subject;
+
+import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.cfg.CfgBoolean;
-import de.mhus.lib.core.security.AaaContext;
-import de.mhus.lib.core.security.AccessApi;
-import de.mhus.lib.errors.AccessDeniedException;
+import de.mhus.lib.core.security.AaaUtil;
+import de.mhus.lib.core.shiro.ShiroSecurity;
+import de.mhus.lib.core.shiro.ShiroUtil;
+import de.mhus.lib.core.shiro.SubjectEnvironment;
 import de.mhus.lib.errors.MRuntimeException;
 import de.mhus.lib.jms.JmsInterceptor;
 import de.mhus.micro.core.api.JmsApi;
@@ -37,61 +41,48 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
     public static final CfgBoolean RELAXED = new CfgBoolean(JmsApi.class, "aaaRelaxed", true);
 
     @Override
-    public void begin(Message message) {
+    public void begin(IProperties callContext, Message message) {
         String ticket;
         try {
             ticket = message.getStringProperty(JmsApi.PARAM_AAA_TICKET);
         } catch (JMSException e) {
             throw new MRuntimeException(e);
         }
+        Subject subject = M.l(ShiroSecurity.class).createSubject();
+        AaaUtil.login(subject, ticket);
         try {
-            AccessApi api = M.l(AccessApi.class);
-            if (api == null) {
-                if (RELAXED.value()) return;
-                else throw new AccessDeniedException("access api not found");
-            }
             String localeStr = message.getStringProperty(JmsApi.PARAM_LOCALE);
-            Locale locale = localeStr == null ? null : Locale.forLanguageTag(localeStr);
-            if (ticket == null) api.process(api.getGuestAccount(), null, false, locale);
-            else api.process(ticket, locale);
+            if (localeStr != null) {
+                ShiroUtil.setLocale(subject, localeStr);
+            }
         } catch (Throwable t) {
             log().d("Incoming Access Denied", message);
             throw new RuntimeException(t);
         }
+        SubjectEnvironment env = ShiroUtil.useSubject(subject);
+        callContext.put(TicketAccessInterceptor.class.getCanonicalName(), env);
     }
 
     @Override
-    public void end(Message message) {
+    public void end(IProperties callContext, Message message) {
 
-        AccessApi api = M.l(AccessApi.class);
-        if (api == null) return;
+        SubjectEnvironment env = (SubjectEnvironment) callContext.get(TicketAccessInterceptor.class.getCanonicalName());
+        if (env == null) return;
 
-        String ticket;
-        try {
-            ticket = message.getStringProperty(JmsApi.PARAM_AAA_TICKET);
-        } catch (JMSException e) {
-            throw new MRuntimeException(e);
-        }
-        if (ticket == null) M.l(AccessApi.class).release(api.getGuestContext());
-        else M.l(AccessApi.class).release(ticket);
+        env.close();
+
     }
 
     @Override
     public void prepare(Message message) {
 
-        AccessApi api = M.l(AccessApi.class);
-        if (api == null) return;
+        Subject subject = ShiroUtil.getSubject();
 
-        AaaContext current = api.getCurrent();
-        if (current == null) return;
-
-        String ticket = api.createTrustTicket(JmsApi.TRUST_NAME.value(), current);
-        Locale l = current.getLocale();
-        if (l == null) l = Locale.getDefault();
-        String locale = l.toString();
+        String ticket = AaaUtil.createTrustTicket(JmsApi.TRUST_NAME.value(), subject);
+        Locale locale = ShiroUtil.getLocale(subject);
         try {
             message.setStringProperty(JmsApi.PARAM_AAA_TICKET, ticket);
-            message.setStringProperty(JmsApi.PARAM_LOCALE, locale);
+            message.setStringProperty(JmsApi.PARAM_LOCALE, locale.toString());
         } catch (JMSException e) {
             throw new MRuntimeException(e);
         }

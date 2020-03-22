@@ -18,8 +18,6 @@ import java.util.List;
 import org.osgi.service.component.annotations.Component;
 
 import de.mhus.lib.adb.Persistable;
-import de.mhus.lib.basics.AclControlled;
-import de.mhus.lib.core.security.AaaContext;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.osgi.api.adb.AbstractDbSchemaService;
@@ -41,7 +39,7 @@ public class MailQueueDbImpl extends AbstractDbSchemaService {
     public void doDestroy() {}
 
     @Override
-    public boolean canCreate(AaaContext context, Persistable obj) throws MException {
+    public boolean canCreate(Persistable obj) throws MException {
         return true; // TODO can everybody create mail queue items?
     }
 
@@ -54,8 +52,4 @@ public class MailQueueDbImpl extends AbstractDbSchemaService {
     @Override
     public void doPostInitialize(XdbService manager) throws Exception {}
 
-    @Override
-    public String getAcl(AaaContext context, Persistable obj) throws MException {
-        return AclControlled.ACL_ALL_ALL;
-    }
 }
