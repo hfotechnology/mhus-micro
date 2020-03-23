@@ -29,6 +29,7 @@ import de.mhus.lib.core.shiro.ShiroSecurity;
 import de.mhus.lib.core.shiro.ShiroUtil;
 import de.mhus.lib.core.shiro.SubjectEnvironment;
 import de.mhus.lib.errors.MRuntimeException;
+import de.mhus.lib.jms.CallContext;
 import de.mhus.lib.jms.JmsInterceptor;
 import de.mhus.micro.core.api.JmsApi;
 
@@ -41,32 +42,32 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
     public static final CfgBoolean RELAXED = new CfgBoolean(JmsApi.class, "aaaRelaxed", true);
 
     @Override
-    public void begin(IProperties callContext, Message message) {
+    public void begin(CallContext callContext) {
         String ticket;
         try {
-            ticket = message.getStringProperty(JmsApi.PARAM_AAA_TICKET);
+            ticket = callContext.getMessage().getStringProperty(JmsApi.PARAM_AAA_TICKET);
         } catch (JMSException e) {
             throw new MRuntimeException(e);
         }
         Subject subject = M.l(ShiroSecurity.class).createSubject();
         AaaUtil.login(subject, ticket);
         try {
-            String localeStr = message.getStringProperty(JmsApi.PARAM_LOCALE);
+            String localeStr = callContext.getMessage().getStringProperty(JmsApi.PARAM_LOCALE);
             if (localeStr != null) {
                 ShiroUtil.setLocale(subject, localeStr);
             }
         } catch (Throwable t) {
-            log().d("Incoming Access Denied", message);
+            log().d("Incoming Access Denied", callContext.getMessage());
             throw new RuntimeException(t);
         }
         SubjectEnvironment env = ShiroUtil.useSubject(subject);
-        callContext.put(TicketAccessInterceptor.class.getCanonicalName(), env);
+        callContext.getProperties().put(TicketAccessInterceptor.class.getCanonicalName(), env);
     }
 
     @Override
-    public void end(IProperties callContext, Message message) {
+    public void end(CallContext callContext) {
 
-        SubjectEnvironment env = (SubjectEnvironment) callContext.get(TicketAccessInterceptor.class.getCanonicalName());
+        SubjectEnvironment env = (SubjectEnvironment) callContext.getProperties().get(TicketAccessInterceptor.class.getCanonicalName());
         if (env == null) return;
 
         env.close();
