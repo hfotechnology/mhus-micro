@@ -213,7 +213,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
         }
         if (operation == null) throw new NotFoundException("operation not found", desc);
 
-        if (!ShiroUtil.checkPermission("local.operation:execute:" + desc.getPath()))
+        if (!ShiroUtil.isPermitted("local.operation:execute:" + desc.getPath()))
             throw new AccessDeniedException("access denied", desc.getPath());
 
         DefaultTaskContext taskContext = new DefaultTaskContext(getClass());
