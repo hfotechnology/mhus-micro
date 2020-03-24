@@ -1,7 +1,6 @@
 package de.mhus.micro.core;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +22,7 @@ import de.mhus.micro.core.api.OperationsProvider;
 
 public class MicroServiceRegistry extends MLog {
 
-    private Map<String, OperationsProvider> register = Collections.unmodifiableMap(new HashMap<>());
+    private Map<String, OperationsProvider> register = new HashMap<>();
 
     public Map<String, OperationsProvider> getRegistry() {
         return register;
