@@ -17,7 +17,7 @@ import org.osgi.service.component.annotations.Component;
 
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.base.service.IdentUtil;
-import de.mhus.lib.core.shiro.ShiroUtil;
+import de.mhus.lib.core.shiro.AccessUtil;
 import de.mhus.lib.core.strategy.AbstractOperation;
 import de.mhus.lib.core.strategy.Operation;
 import de.mhus.lib.core.strategy.OperationDescription;
@@ -31,7 +31,7 @@ public class PingOperation extends AbstractOperation {
     @Override
     protected OperationResult doExecute2(TaskContext context) throws Exception {
         log().d("PING PONG", context.getParameters());
-        String user = ShiroUtil.getPrincipal();
+        String user = AccessUtil.getPrincipal();
         String ident = IdentUtil.getServerIdent();
         String pid = MSystem.getPid();
         String host = MSystem.getHostname();

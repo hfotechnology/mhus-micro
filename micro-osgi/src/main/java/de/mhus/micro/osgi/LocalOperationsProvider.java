@@ -32,7 +32,7 @@ import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.base.service.IdentUtil;
-import de.mhus.lib.core.shiro.ShiroUtil;
+import de.mhus.lib.core.shiro.AccessUtil;
 import de.mhus.lib.core.strategy.DefaultTaskContext;
 import de.mhus.lib.core.strategy.NotSuccessful;
 import de.mhus.lib.core.strategy.Operation;
@@ -213,7 +213,7 @@ public class LocalOperationsProvider extends MLog implements OperationsProvider 
         }
         if (operation == null) throw new NotFoundException("operation not found", desc);
 
-        if (!ShiroUtil.isPermitted("local.operation:execute:" + desc.getPath()))
+        if (!AccessUtil.isPermitted("local.operation:execute:" + desc.getPath()))
             throw new AccessDeniedException("access denied", desc.getPath());
 
         DefaultTaskContext taskContext = new DefaultTaskContext(getClass());

@@ -20,13 +20,9 @@ import javax.jms.Message;
 
 import org.apache.shiro.subject.Subject;
 
-import de.mhus.lib.core.IProperties;
-import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.cfg.CfgBoolean;
-import de.mhus.lib.core.security.AaaUtil;
-import de.mhus.lib.core.shiro.ShiroSecurity;
-import de.mhus.lib.core.shiro.ShiroUtil;
+import de.mhus.lib.core.shiro.AccessUtil;
 import de.mhus.lib.core.shiro.SubjectEnvironment;
 import de.mhus.lib.errors.MRuntimeException;
 import de.mhus.lib.jms.CallContext;
@@ -49,18 +45,17 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
         } catch (JMSException e) {
             throw new MRuntimeException(e);
         }
-        Subject subject = M.l(ShiroSecurity.class).createSubject();
-        AaaUtil.login(subject, ticket);
+        Subject subject =  AccessUtil.login(ticket);
         try {
             String localeStr = callContext.getMessage().getStringProperty(JmsApi.PARAM_LOCALE);
             if (localeStr != null) {
-                ShiroUtil.setLocale(subject, localeStr);
+                AccessUtil.setLocale(subject, localeStr);
             }
         } catch (Throwable t) {
             log().d("Incoming Access Denied", callContext.getMessage());
             throw new RuntimeException(t);
         }
-        SubjectEnvironment env = ShiroUtil.useSubject(subject);
+        SubjectEnvironment env = AccessUtil.useSubject(subject);
         callContext.getProperties().put(TicketAccessInterceptor.class.getCanonicalName(), env);
     }
 
@@ -77,10 +72,10 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
     @Override
     public void prepare(Message message) {
 
-        Subject subject = ShiroUtil.getSubject();
+        Subject subject = AccessUtil.getSubject();
 
-        String ticket = AaaUtil.createTrustTicket(JmsApi.TRUST_NAME.value(), subject);
-        Locale locale = ShiroUtil.getLocale(subject);
+        String ticket = AccessUtil.createTrustTicket(JmsApi.TRUST_NAME.value(), subject);
+        Locale locale = AccessUtil.getLocale(subject);
         try {
             message.setStringProperty(JmsApi.PARAM_AAA_TICKET, ticket);
             message.setStringProperty(JmsApi.PARAM_LOCALE, locale.toString());

@@ -32,7 +32,7 @@ import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.config.XmlConfigFile;
-import de.mhus.lib.core.shiro.ShiroUtil;
+import de.mhus.lib.core.shiro.AccessUtil;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationToIfcProxy;
 import de.mhus.lib.core.util.MUri;
@@ -268,7 +268,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
 
         DbConnection con = null;
         try {
-            if (!ShiroUtil.isAdmin())
+            if (!AccessUtil.isAdmin())
                 throw new IOException("Not supported"); // TODO use ACL!!!!
 
             FileQueueApi api = M.l(FileQueueApi.class);
@@ -351,7 +351,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
         String path = normalizePath(uri.getPath());
         DbConnection con = null;
         try {
-            if (!ShiroUtil.isAdmin())
+            if (!AccessUtil.isAdmin())
                 throw new IOException("Not supported"); // TODO use ACL!!!!
 
             con = pool.getConnection();
@@ -401,7 +401,7 @@ public class DfsSqlProvider extends OperationToIfcProxy implements DfsProviderOp
         String path = normalizePath(uri.getPath());
         DbConnection con = null;
         try {
-            if (!ShiroUtil.isAdmin())
+            if (!AccessUtil.isAdmin())
                 throw new IOException("Not supported"); // TODO use ACL!!!!
 
             con = pool.getConnection();
