@@ -25,7 +25,7 @@ import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.shiro.AccessUtil;
 import de.mhus.lib.core.shiro.SubjectEnvironment;
 import de.mhus.lib.errors.MRuntimeException;
-import de.mhus.lib.jms.CallContext;
+import de.mhus.lib.jms.JmsContext;
 import de.mhus.lib.jms.JmsInterceptor;
 import de.mhus.micro.core.api.JmsApi;
 
@@ -38,31 +38,31 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
     public static final CfgBoolean RELAXED = new CfgBoolean(JmsApi.class, "aaaRelaxed", true);
 
     @Override
-    public void begin(CallContext callContext) {
+    public void begin(JmsContext context) {
         String ticket;
         try {
-            ticket = callContext.getMessage().getStringProperty(JmsApi.PARAM_AAA_TICKET);
+            ticket = context.getMessage().getStringProperty(JmsApi.PARAM_AAA_TICKET);
         } catch (JMSException e) {
             throw new MRuntimeException(e);
         }
         Subject subject =  AccessUtil.login(ticket);
         try {
-            String localeStr = callContext.getMessage().getStringProperty(JmsApi.PARAM_LOCALE);
+            String localeStr = context.getMessage().getStringProperty(JmsApi.PARAM_LOCALE);
             if (localeStr != null) {
                 AccessUtil.setLocale(subject, localeStr);
             }
         } catch (Throwable t) {
-            log().d("Incoming Access Denied", callContext.getMessage());
+            log().d("Incoming Access Denied", context.getMessage());
             throw new RuntimeException(t);
         }
         SubjectEnvironment env = AccessUtil.useSubject(subject);
-        callContext.getProperties().put(TicketAccessInterceptor.class.getCanonicalName(), env);
+        context.getProperties().put(TicketAccessInterceptor.class.getCanonicalName(), env);
     }
 
     @Override
-    public void end(CallContext callContext) {
+    public void end(JmsContext context) {
 
-        SubjectEnvironment env = (SubjectEnvironment) callContext.getProperties().get(TicketAccessInterceptor.class.getCanonicalName());
+        SubjectEnvironment env = (SubjectEnvironment) context.getProperties().get(TicketAccessInterceptor.class.getCanonicalName());
         if (env == null) return;
 
         env.close();
@@ -70,8 +70,8 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
     }
 
     @Override
-    public void prepare(Message message) {
-
+    public void prepare(JmsContext context) {
+        Message message = context.getMessage();
         Subject subject = AccessUtil.getSubject();
 
         String ticket = AccessUtil.createTrustTicket(JmsApi.TRUST_NAME.value(), subject);
@@ -85,5 +85,5 @@ public class TicketAccessInterceptor extends MLog implements JmsInterceptor {
     }
 
     @Override
-    public void answer(Message message) {}
+    public void answer(JmsContext context) {}
 }
