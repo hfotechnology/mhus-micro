@@ -54,7 +54,8 @@ public class MicroServiceCmd extends AbstractCmd {
                             + " info <path>\n"
                             + " execute <path> [key=value]*\n"
                             + " search\n"
-                            + " ping [ident]",
+                            + " ping [ident]\n"
+                            + " request - service discovery request",
             multiValued = false)
     String cmd;
 
@@ -111,14 +112,16 @@ public class MicroServiceCmd extends AbstractCmd {
             if (parameters != null) tags.add(OperationDescriptor.TAG_IDENT + "=" + parameters[0]);
             OperationDescriptor desc =
                     api.findOperation(PingOperation.class.getCanonicalName(), null, tags);
-            long now = System.currentTimeMillis();
+            long start = System.currentTimeMillis();
             OperationResult res = api.doExecute(desc, new MProperties());
+            long after = System.currentTimeMillis();
             if (!res.isSuccessful()) throw new MException("Ping not successful");
             MProperties map = res.getResultAs();
             long other = map.getLong("time", 0);
             if (other <= 0) throw new MException("No time sent");
-            long diff = other - now;
-            System.out.println("Time difference: " + diff);
+            System.out.println("Time difference: " + (other - start));
+            System.out.println("Duration: " + (after - start));
+            System.out.println("Corrected difference: " + ( (other - start) - (after - start)/2 - 4 ) ); // 4 is empiric
         } else if (cmd.equals("list")) {
             ConsoleTable out = new ConsoleTable(tblOpt);
             out.setHeaderValues("address", "title", "tags", "parameters", "uuid");
