@@ -15,17 +15,18 @@ package de.mhus.micro.osgi;
 
 import org.osgi.service.component.annotations.Component;
 
+import de.mhus.lib.annotations.strategy.OperationService;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.base.service.IdentUtil;
 import de.mhus.lib.core.shiro.AccessUtil;
 import de.mhus.lib.core.strategy.AbstractOperation;
 import de.mhus.lib.core.strategy.Operation;
-import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.strategy.Successful;
 import de.mhus.lib.core.strategy.TaskContext;
 
 @Component(service = Operation.class, property = "tags=acl=*")
+@OperationService(title = "Ping")
 public class PingOperation extends AbstractOperation {
 
     @Override
@@ -43,8 +44,4 @@ public class PingOperation extends AbstractOperation {
                 host, "free", free, "time", "" + time);
     }
 
-    @Override
-    protected OperationDescription createDescription() {
-        return new OperationDescription(getUuid(), PingOperation.class, this, "Ping");
-    }
 }

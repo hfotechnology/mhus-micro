@@ -16,6 +16,7 @@ package de.mhus.micro.karaf;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
@@ -23,6 +24,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MXml;
@@ -49,11 +51,11 @@ public class MicroServiceCmd extends AbstractCmd {
             required = true,
             description =
                     "Command:\n"
-                            + " list\n"
+                            + " list [path]\n"
                             + " action\n"
-                            + " info <path>\n"
+                            + " info <path> [tag filter]\n"
+                            + " search <regex address> [tag filter]\n"
                             + " execute <path> [key=value]*\n"
-                            + " search\n"
                             + " ping [ident]\n"
                             + " request - service discovery request",
             multiValued = false)
@@ -92,9 +94,10 @@ public class MicroServiceCmd extends AbstractCmd {
     @Option(
             name = "-o",
             aliases = "--options",
-            description = "Execute Options separated by pipe",
-            required = false)
-    String options = null;
+            description = "Execute Options",
+            required = false,
+            multiValued = true)
+    String[] options = null;
 
     @Option(name = "-p", aliases = "--print", description = "Print File Content", required = false)
     boolean print = false;
@@ -107,7 +110,27 @@ public class MicroServiceCmd extends AbstractCmd {
 
         OperationApi api = M.l(OperationApi.class);
 
-        if (cmd.equals("ping")) {
+        if (cmd.equals("search")) {
+            ConsoleTable out = new ConsoleTable(tblOpt);
+            out.setHeaderValues("address", "title", "tags", "parameters", "uuid");
+            List<String> tags = null;
+            if (MCollection.isSet(parameters))
+                tags = MCollection.toList(parameters);
+
+            for (OperationDescriptor desc :
+                    api.findOperations(
+                            (String)null, version == null ? null : new VersionRange(version), tags)) {
+                
+                if (desc.getAddress().toString().matches(path))
+                    out.addRowValues(
+                            desc.getAddress(),
+                            desc.getTitle(),
+                            desc.getTags(),
+                            OperationUtil.getParameters(desc),
+                            desc.getUuid());
+            }
+            out.print(System.out);
+        } else if (cmd.equals("ping")) {
             LinkedList<String> tags = new LinkedList<>();
             if (parameters != null) tags.add(OperationDescriptor.TAG_IDENT + "=" + parameters[0]);
             OperationDescriptor desc =
@@ -123,11 +146,16 @@ public class MicroServiceCmd extends AbstractCmd {
             System.out.println("Duration: " + (after - start));
             System.out.println("Corrected difference: " + ( (other - start) - (after - start)/2 - 4 ) ); // 4 is empiric
         } else if (cmd.equals("list")) {
+
+            List<String> tags = null;
+            if (MCollection.isSet(parameters))
+                tags = MCollection.toList(parameters);
+            
             ConsoleTable out = new ConsoleTable(tblOpt);
             out.setHeaderValues("address", "title", "tags", "parameters", "uuid");
             for (OperationDescriptor desc :
                     api.findOperations(
-                            path, version == null ? null : new VersionRange(version), null)) {
+                            path, version == null ? null : new VersionRange(version), tags)) {
                 out.addRowValues(
                         desc.getAddress(),
                         desc.getTitle(),
@@ -153,15 +181,13 @@ public class MicroServiceCmd extends AbstractCmd {
             }
             System.out.println("Form   : " + xml);
         } else if (cmd.equals("execute")) {
-            String[] executeOptions = null;
-            if (options != null) executeOptions = options.split("\\|");
 
             MProperties properties = MProperties.explodeToMProperties(parameters);
             OperationResult res = null;
             if (path.indexOf("://") >= 0) {
                 OperationAddress addr = new OperationAddress(path);
                 OperationDescriptor desc = api.getOperation(addr);
-                res = api.doExecute(desc, properties, executeOptions);
+                res = api.doExecute(desc, properties, options);
             } else
                 res =
                         api.doExecute(
@@ -169,7 +195,7 @@ public class MicroServiceCmd extends AbstractCmd {
                                 version == null ? null : new VersionRange(version),
                                 null,
                                 properties,
-                                executeOptions);
+                                options);
             System.out.println("Result: " + res);
             if (res != null) {
                 System.out.println("MSG: " + res.getMsg());
