@@ -23,7 +23,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
-import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
@@ -32,10 +31,10 @@ import de.mhus.micro.ext.api.mailqueue.MailMessage;
 import de.mhus.micro.ext.api.mailqueue.MailQueueOperation;
 import de.mhus.micro.ext.api.mailqueue.MailQueueOperation.STATUS;
 import de.mhus.micro.ext.api.mailqueue.MutableMailMessage;
+import de.mhus.micro.ext.mailqueue.MailQueueDbImpl;
 import de.mhus.micro.ext.mailqueue.MailQueueTimer;
 import de.mhus.micro.ext.mailqueue.SopMailTask;
 import de.mhus.micro.ext.mailqueue._SopMailTask;
-import de.mhus.osgi.api.adb.AdbApi;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 
 @Command(scope = "sop", name = "mailqueue", description = "Main queue actions")
@@ -110,7 +109,7 @@ public class MailQueueCmd extends AbstractCmd {
                             "attempts",
                             "created");
 
-                    XdbService manager = M.l(AdbApi.class).getManager();
+                    XdbService manager = MailQueueDbImpl.instance().getManager();
                     AQuery<SopMailTask> q = Db.query(SopMailTask.class);
                     if (!all) q.eq(_SopMailTask._STATUS, MailQueueOperation.STATUS.READY);
                     for (SopMailTask task : manager.getByQualification(q)) {
@@ -167,7 +166,7 @@ public class MailQueueCmd extends AbstractCmd {
                 {
                     if (parameters == null || parameters.length == 0) {
                         // retry all
-                        XdbService manager = M.l(AdbApi.class).getManager();
+                        XdbService manager = MailQueueDbImpl.instance().getManager();
                         for (SopMailTask task :
                                 manager.getByQualification(
                                         Db.query(SopMailTask.class)
@@ -180,8 +179,7 @@ public class MailQueueCmd extends AbstractCmd {
                         }
                     } else {
                         UUID id = UUID.fromString(parameters[0]);
-                        AdbApi api = M.l(AdbApi.class);
-                        SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+                        SopMailTask task = MailQueueDbImpl.instance().getManager().getObject(SopMailTask.class, id);
                         if (force
                                 || task.getStatus() == STATUS.ERROR
                                 || task.getStatus() == STATUS.ERROR_PREPARE) {
@@ -197,8 +195,7 @@ public class MailQueueCmd extends AbstractCmd {
             case "send":
                 {
                     UUID id = UUID.fromString(parameters[0]);
-                    AdbApi api = M.l(AdbApi.class);
-                    SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+                    SopMailTask task = MailQueueDbImpl.instance().getManager().getObject(SopMailTask.class, id);
                     if (task == null) {
                         System.out.println("Task not found");
                         return null;
@@ -215,7 +212,7 @@ public class MailQueueCmd extends AbstractCmd {
                 {
                     if (parameters == null || parameters.length == 0) {
                         // retry all
-                        XdbService manager = M.l(AdbApi.class).getManager();
+                        XdbService manager = MailQueueDbImpl.instance().getManager();
                         for (SopMailTask task :
                                 manager.getByQualification(
                                         Db.query(SopMailTask.class)
@@ -228,8 +225,7 @@ public class MailQueueCmd extends AbstractCmd {
                         }
                     } else {
                         UUID id = UUID.fromString(parameters[0]);
-                        AdbApi api = M.l(AdbApi.class);
-                        SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+                        SopMailTask task = MailQueueDbImpl.instance().getManager().getObject(SopMailTask.class, id);
                         if (force
                                 || task.getStatus() == STATUS.ERROR
                                 || task.getStatus() == STATUS.ERROR_PREPARE) {
@@ -244,7 +240,7 @@ public class MailQueueCmd extends AbstractCmd {
                 break;
             case "cleanup":
                 {
-                    XdbService manager = M.l(AdbApi.class).getManager();
+                    XdbService manager = MailQueueDbImpl.instance().getManager();
                     for (SopMailTask task :
                             manager.getByQualification(
                                     Db.query(SopMailTask.class)
@@ -265,8 +261,7 @@ public class MailQueueCmd extends AbstractCmd {
             case "delete":
                 {
                     UUID id = UUID.fromString(parameters[0]);
-                    AdbApi api = M.l(AdbApi.class);
-                    SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+                    SopMailTask task = MailQueueDbImpl.instance().getManager().getObject(SopMailTask.class, id);
                     if (force
                             || task.getStatus() == STATUS.ERROR
                             || task.getStatus() == STATUS.ERROR_PREPARE

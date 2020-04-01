@@ -1,7 +1,7 @@
 package de.mhus.micro.ext.mailqueue;
 
-import de.mhus.lib.basics.consts.Identifier;
 import de.mhus.lib.basics.consts.ConstBase;
+import de.mhus.lib.basics.consts.Identifier;
 
 /**
  * File created by mhu const generator. Changes will be overwritten.

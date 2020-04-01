@@ -36,7 +36,6 @@ import de.mhus.lib.core.mail.MailAttachment;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.xdb.XdbService;
 import de.mhus.micro.ext.api.mailqueue.MailQueueOperation;
-import de.mhus.osgi.api.adb.AdbApi;
 import de.mhus.osgi.api.scheduler.SchedulerService;
 import de.mhus.osgi.api.scheduler.SchedulerServiceAdapter;
 
@@ -73,7 +72,7 @@ public class MailQueueTimer extends SchedulerServiceAdapter {
     public void run(Object environment) {
         try {
             Date now = new Date();
-            XdbService manager = M.l(AdbApi.class).getManager();
+            XdbService manager = MailQueueDbImpl.instance().getManager();
             if (manager == null) {
                 log().w("XdbService is null");
                 return;

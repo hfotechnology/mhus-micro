@@ -15,17 +15,42 @@ package de.mhus.micro.ext.mailqueue;
 
 import java.util.List;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 
+import de.mhus.db.osgi.api.adb.AbstractCommonAdbConsumer;
+import de.mhus.db.osgi.api.adb.CommonAdbConsumer;
+import de.mhus.db.osgi.api.adb.ReferenceCollector;
+import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
-import de.mhus.osgi.api.adb.AbstractDbSchemaService;
-import de.mhus.osgi.api.adb.DbSchemaService;
-import de.mhus.osgi.api.adb.ReferenceCollector;
 
-@Component(service = DbSchemaService.class, immediate = true)
-public class MailQueueDbImpl extends AbstractDbSchemaService {
+@Component(service = CommonAdbConsumer.class, immediate = true)
+public class MailQueueDbImpl extends AbstractCommonAdbConsumer {
+
+    private static MailQueueDbImpl instance;
+
+    public static MailQueueDbImpl instance() {
+        return instance;
+    }
+    
+    @Activate
+    public void doActivate(ComponentContext ctx) {
+        instance = this;
+    }
+
+    @Deactivate
+    public void doDeactivate(ComponentContext ctx) {
+        instance = null;
+    }
+    
+    @Override
+    public DbManager getManager() {
+        return super.getManager();
+    }
 
     @Override
     public void registerObjectTypes(List<Class<? extends Persistable>> list) {
@@ -33,7 +58,7 @@ public class MailQueueDbImpl extends AbstractDbSchemaService {
     }
 
     @Override
-    public void doInitialize(XdbService dbService) {}
+    public void doInitialize() {}
 
     @Override
     public void doDestroy() {}

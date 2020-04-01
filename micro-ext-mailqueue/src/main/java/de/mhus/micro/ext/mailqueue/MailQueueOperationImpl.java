@@ -35,7 +35,6 @@ import de.mhus.micro.ext.api.dfs.DfsApi;
 import de.mhus.micro.ext.api.dfs.FileQueueApi;
 import de.mhus.micro.ext.api.mailqueue.MailMessage;
 import de.mhus.micro.ext.api.mailqueue.MailQueueOperation;
-import de.mhus.osgi.api.adb.AdbApi;
 import de.mhus.osgi.api.services.MOsgi;
 
 @Component(immediate = true, service = Operation.class)
@@ -63,10 +62,10 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
             log().d("mails are null");
             return;
         }
-        AdbApi api = M.l(AdbApi.class);
         // create task
+        
         for (MailMessage mail : mails.getSeparateMails()) {
-            SopMailTask task = api.getManager().inject(new SopMailTask(mail));
+            SopMailTask task = MailQueueDbImpl.instance().getManager().inject(new SopMailTask(mail));
             if (properties != null) task.getProperties().putReadProperties(properties);
             task.save();
             try {
@@ -147,16 +146,14 @@ public class MailQueueOperationImpl extends OperationToIfcProxy implements MailQ
 
     @Override
     public STATUS getStatus(UUID id) throws MException {
-        AdbApi api = M.l(AdbApi.class);
-        SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+        SopMailTask task = MailQueueDbImpl.instance().getManager().getObject(SopMailTask.class, id);
         if (task == null) throw new NotFoundException(id);
         return task.getStatus();
     }
 
     @Override
     public Date getLastSendAttempt(UUID id) throws MException {
-        AdbApi api = M.l(AdbApi.class);
-        SopMailTask task = api.getManager().getObject(SopMailTask.class, id);
+        SopMailTask task = MailQueueDbImpl.instance().getManager().getObject(SopMailTask.class, id);
         if (task == null) throw new NotFoundException(id);
         return task.getLastSendAttempt();
     }
