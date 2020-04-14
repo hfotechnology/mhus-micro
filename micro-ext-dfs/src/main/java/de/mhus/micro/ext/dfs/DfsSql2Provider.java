@@ -32,7 +32,8 @@ import de.mhus.lib.core.M;
 import de.mhus.lib.core.MConstants;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MSystem;
-import de.mhus.lib.core.config.XmlConfigFile;
+import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.config.IConfigFactory;
 import de.mhus.lib.core.shiro.AccessUtil;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationToIfcProxy;
@@ -508,7 +509,7 @@ public class DfsSql2Provider extends OperationToIfcProxy implements DfsProviderO
         try {
             URL url = MSystem.locateResource(this, "Sql2DfsStorage.xml");
             DbConnection con = pool.getConnection();
-            XmlConfigFile data = new XmlConfigFile(url.openStream());
+            IConfig data = M.l(IConfigFactory.class).read(url);
             data.setString("prefix", prefix);
             pool.getDialect().createStructure(data, con, null, false);
             con.close();
