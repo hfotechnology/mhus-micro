@@ -496,7 +496,7 @@ public class DfsSql2Provider extends OperationToIfcProxy implements DfsProviderO
     }
 
     private void init() {
-        dataSource = new DataSourceUtil().getDataSource(dataSourceName);
+        dataSource = DataSourceUtil.getDataSource(dataSourceName);
         if (dataSource == null) throw new MRuntimeException("datasource not found", dataSourceName);
         if (dsProvider != null) {
             dsProvider.setDataSource(dataSource);

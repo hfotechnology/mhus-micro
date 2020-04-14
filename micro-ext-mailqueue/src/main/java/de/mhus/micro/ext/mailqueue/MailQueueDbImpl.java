@@ -24,7 +24,6 @@ import de.mhus.db.osgi.api.adb.AbstractCommonAdbConsumer;
 import de.mhus.db.osgi.api.adb.CommonAdbConsumer;
 import de.mhus.db.osgi.api.adb.ReferenceCollector;
 import de.mhus.lib.adb.DbManager;
-import de.mhus.lib.adb.Persistable;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 
