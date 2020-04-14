@@ -53,7 +53,7 @@ public class MailQueueDbImpl extends AbstractCommonAdbConsumer {
     }
 
     @Override
-    public void registerObjectTypes(List<Class<? extends Persistable>> list) {
+    public void registerObjectTypes(List<Class<?>> list) {
         list.add(SopMailTask.class);
     }
 
@@ -64,12 +64,12 @@ public class MailQueueDbImpl extends AbstractCommonAdbConsumer {
     public void doDestroy() {}
 
     @Override
-    public boolean canCreate(Persistable obj) throws MException {
+    public boolean canCreate(Object obj) throws MException {
         return true; // TODO can everybody create mail queue items?
     }
 
     @Override
-    public void collectReferences(Persistable object, ReferenceCollector collector) {}
+    public void collectReferences(Object object, ReferenceCollector collector) {}
 
     @Override
     public void doCleanup() {}

@@ -23,6 +23,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
+import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MFile;
@@ -139,7 +140,7 @@ public class MicroServiceCmd extends AbstractCmd {
             OperationResult res = api.doExecute(desc, new MProperties());
             long after = System.currentTimeMillis();
             if (!res.isSuccessful()) throw new MException("Ping not successful");
-            MProperties map = res.getResultAs();
+            IProperties map = res.getResultAsMap();
             long other = map.getLong("time", 0);
             if (other <= 0) throw new MException("No time sent");
             System.out.println("Time difference: " + (other - start));
