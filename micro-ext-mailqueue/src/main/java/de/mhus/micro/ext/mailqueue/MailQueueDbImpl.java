@@ -21,13 +21,13 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
 import de.mhus.db.osgi.api.adb.AbstractCommonAdbConsumer;
-import de.mhus.db.osgi.api.adb.CommonConsumer;
+import de.mhus.db.osgi.api.adb.CommonDbConsumer;
 import de.mhus.db.osgi.api.adb.ReferenceCollector;
 import de.mhus.lib.adb.DbManager;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.xdb.XdbService;
 
-@Component(service = CommonConsumer.class, property = "commonService=adb", immediate = true)
+@Component(service = CommonDbConsumer.class, property = "commonService=adb", immediate = true)
 public class MailQueueDbImpl extends AbstractCommonAdbConsumer {
 
     private static MailQueueDbImpl instance;
