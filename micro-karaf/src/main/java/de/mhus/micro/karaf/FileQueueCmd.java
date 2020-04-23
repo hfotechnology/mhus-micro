@@ -124,7 +124,7 @@ public class FileQueueCmd extends AbstractCmd {
             case "touch":
                 {
                     UUID id = UUID.fromString(parameters[0]);
-                    api.touchFile(id, parameters.length > 1 ? M.c(parameters[1], 0) : 0);
+                    api.touchFile(id, parameters.length > 1 ? M.to(parameters[1], 0) : 0);
                     System.out.println("OK");
                 }
                 break;

@@ -39,8 +39,8 @@ public class FileInfoImpl implements FileInfo {
         name = uri.getPath();
         String[] params = uri.getParams();
         if (params != null) {
-            size = M.c(params[0], 0);
-            modified = M.c(params[1], new Date()).getTime();
+            size = M.to(params[0], 0);
+            modified = M.to(params[1], new Date()).getTime();
         }
     }
 
