@@ -1,0 +1,40 @@
+== Specification
+
+=== Idea
+
+The basic idea is to generalize the usage of different micro service and RCP
+concepts and frameworks. The focus is more on how to discover services from
+providers and distribute it to the consumers.
+
+We separate in provide, consume and discovery services. 
+
+The main goal for the provider is to use the preferred framework and SDK and 
+for the consumer not to matter how to reach or use the service if it's 
+implemented in another kind of framework.
+
+The consumer only need to know the name of the service to consume and the type
+of request and response data (json, plain text, binary, ...). Mapping of 
+data types are done by the clients.
+
+Core architecture and focus should be rest web services. It's the common
+way to implement micro services. But there are also arguments for JMS or
+other frameworks to use.
+
+Load balancing and heals checks are done in the background. Only providers are
+affected in this concepts by providing information of the current state of
+the service.
+
+Consumers should be able to select by using label selectors which providers
+are used for a call.
+
+=== Concepts
+
+The basic concept is the 'broker'. The broker can be embedded or a server
+implementation. The embedded should be used for small solutions. More
+enterprise applications should use the server.
+
+The server must provide a cluster functionality to scale the traffic. The focus
+is to run in a kubernetes environment. This means the presence of 'services' for
+TCP transports.
+
+This all is done by the 'broker'. The tasks of it are distribute, route and 
