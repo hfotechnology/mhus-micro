@@ -16,10 +16,15 @@ package de.mhus.micro.core.api;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
+import de.mhus.lib.core.config.DefaultConfigFactory;
+import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.config.MConfig;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.core.util.VersionRange;
+import de.mhus.lib.errors.MException;
+import de.mhus.lib.errors.MRuntimeException;
 import de.mhus.lib.errors.NotFoundException;
 
 public class OperationAnswer {
@@ -28,9 +33,13 @@ public class OperationAnswer {
 
     public OperationAnswer() {}
 
-    public OperationAnswer(String path, Version version, IProperties properties) {
-        description =
-                path + (version == null ? "" : ":" + version) + "?" + MUri.implode(properties);
+    public OperationAnswer(String path, Version version, IConfig properties) {
+        try {
+            description =
+                    path + (version == null ? "" : ":" + version) + "?" + IConfig.toCompactJsonString(properties);
+        } catch (MException e) {
+            throw new MRuntimeException(e);
+        }
     }
 
     public OperationAnswer(String description) {
@@ -60,17 +69,21 @@ public class OperationAnswer {
         return new VersionRange(out.substring(p + 1));
     }
 
-    public MProperties getProperties() {
+    public IConfig getContent() {
         int p = description.indexOf('?');
-        if (p < 0) return new MProperties();
-        return new MProperties(MUri.explode(description.substring(p + 1)));
+        if (p < 0) return new MConfig();
+        try {
+            return IConfig.readConfigFromString(description.substring(p + 1));
+        } catch (MException e) {
+            throw new MRuntimeException(description, e);
+        }
     }
 
-    public OperationResult send(IProperties properties, String... executeOptions)
+    public OperationResult send(IConfig request, String... executeOptions)
             throws NotFoundException {
         OperationApi api = M.l(OperationApi.class);
-        MProperties prop = getProperties();
-        if (properties != null) prop.putAll(properties);
+        IConfig prop = getContent();
+        if (request != null) prop.putAll(request);
         OperationResult res =
                 api.doExecute(getPath(), getVersionRange(), null, prop, executeOptions);
         return res;

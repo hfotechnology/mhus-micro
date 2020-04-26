@@ -21,7 +21,8 @@ import java.util.List;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
-import de.mhus.lib.core.MProperties;
+import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.config.MConfig;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
@@ -32,7 +33,7 @@ public class OperationsSelector {
     private VersionRange version;
     private Collection<String> providedTags;
     private LinkedList<Selector> selectors = new LinkedList<>();
-    private MProperties properties;
+    private IConfig properties;
     private String[] executeOptions;
 
     public OperationsSelector setFilter(Class<?> filter) {
@@ -71,13 +72,13 @@ public class OperationsSelector {
     }
 
     public OperationsSelector putProperties(String key, Object value) {
-        if (properties == null) properties = new MProperties();
+        if (properties == null) properties = new MConfig();
         properties.put(key, value);
         return this;
     }
 
     public OperationsSelector putAllProperties(IProperties all) {
-        if (properties == null) properties = new MProperties();
+        if (properties == null) properties = new MConfig();
         properties.putAll(all);
         return this;
     }
@@ -104,7 +105,7 @@ public class OperationsSelector {
         return list;
     }
 
-    public OperationResult doExecute(IProperties properties, String... executeOptions)
+    public OperationResult doExecute(IConfig properties, String... executeOptions)
             throws NotFoundException {
         OperationDescriptor desc = doSelect();
         if (desc == null) throw new NotFoundException(filter, version, providedTags);
@@ -115,7 +116,7 @@ public class OperationsSelector {
         return doExecute(properties, executeOptions);
     }
 
-    public List<OperationResult> doExecuteAll(IProperties properties, String... executeOptions)
+    public List<OperationResult> doExecuteAll(IConfig properties, String... executeOptions)
             throws NotFoundException {
         List<OperationDescriptor> list = doSelectAll();
         LinkedList<OperationResult> res = new LinkedList<>();

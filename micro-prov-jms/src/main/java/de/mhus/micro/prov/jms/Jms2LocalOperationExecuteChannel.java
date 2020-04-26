@@ -43,6 +43,8 @@ import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.base.service.ServerIdent;
 import de.mhus.lib.core.cfg.CfgBoolean;
 import de.mhus.lib.core.cfg.CfgString;
+import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.config.MConfig;
 import de.mhus.lib.core.lang.SerializedValue;
 import de.mhus.lib.core.pojo.DefaultFilter;
 import de.mhus.lib.core.pojo.MPojo;
@@ -128,10 +130,10 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
         // return "sop";
     }
 
-    protected OperationResult doExecute(String path, VersionRange version, IProperties properties)
+    protected OperationResult doExecute(String path, VersionRange version, IConfig request)
             throws NotFoundException {
 
-        log().d("execute operation", path, properties);
+        log().d("execute operation", path, request);
 
         OperationApi api = M.l(OperationApi.class);
         OperationResult res =
@@ -139,7 +141,7 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
                         path,
                         version,
                         null,
-                        properties,
+                        request,
                         OperationApi.LOCAL_ONLY,
                         OperationApi.RAW_RESULT);
 
@@ -184,28 +186,28 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
         String path = msg.getStringProperty(JmsApi.PARAM_OPERATION_PATH);
         if (path == null) return null;
         String version = msg.getStringProperty(JmsApi.PARAM_OPERATION_VERSION);
-        IProperties properties = null;
+        IConfig request = null;
         if (msg instanceof MapMessage) {
-            properties = MJms.getMapProperties((MapMessage) msg);
+            request = MJms.getMapProperties((MapMessage) msg);
         } else if (msg instanceof ObjectMessage) {
             Serializable obj = ((ObjectMessage) msg).getObject();
             if (obj == null) {
 
-            } else if (obj instanceof MProperties) {
-                properties = (MProperties) obj;
+            } else if (obj instanceof MConfig) {
+                request = (MConfig) obj;
             } else if (obj instanceof Map) {
-                properties = new MProperties((Map) obj);
+                request = new MProperties((Map) obj);
             }
         }
 
-        if (properties == null) properties = new MProperties(); // empty
+        if (request == null) request = new MConfig(); // empty
 
         OperationResult res = null;
         if (path.equals(JmsApi.OPERATION_LIST)) {
             String list = MString.join(getPublicOperations().iterator(), ",");
             res = new Successful(JmsApi.OPERATION_LIST, "list", OperationResult.OK, "list", list);
         } else if (path.equals(JmsApi.OPERATION_INFO)) {
-            String id = properties.getString(JmsApi.PARAM_OPERATION_ID, null);
+            String id = request.getString(JmsApi.PARAM_OPERATION_ID, null);
             if (id == null)
                 res = new NotSuccessful(JmsApi.OPERATION_INFO, "not found", OperationResult.NOT_FOUND);
             else {
@@ -238,7 +240,7 @@ public class Jms2LocalOperationExecuteChannel extends AbstractJmsDataChannel {
                         doExecute(
                                 path,
                                 version == null ? null : new VersionRange(version),
-                                properties);
+                                request);
             } catch (NotFoundException nfe) {
                 res = new NotSuccessful(path, "not found", OperationResult.NOT_FOUND);
             }

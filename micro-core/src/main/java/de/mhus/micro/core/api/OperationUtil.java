@@ -23,12 +23,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import de.mhus.lib.core.IProperties;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
+
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MDate;
-import de.mhus.lib.core.MProperties;
+import de.mhus.lib.core.MJson;
 import de.mhus.lib.core.MString;
+import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.config.MConfig;
+import de.mhus.lib.core.json.JacksonTransformer;
+import de.mhus.lib.core.json.TransformHelper;
 import de.mhus.lib.core.logging.MLogUtil;
 import de.mhus.lib.core.strategy.OperationDescription;
 import de.mhus.lib.core.strategy.OperationResult;
@@ -41,47 +48,47 @@ import de.mhus.lib.errors.NotFoundException;
 
 public class OperationUtil {
 
-    public static OperationResult doExecute(OperationsSelector selector, IProperties properties)
+    public static OperationResult doExecute(OperationsSelector selector, IConfig request)
             throws NotFoundException {
-        return selector.doExecute(properties);
+        return selector.doExecute(request);
     }
 
     public static OperationResult doExecute(
-            Class<?> filter, IProperties properties, String... providedTags)
+            Class<?> filter, IConfig request, String... providedTags)
             throws NotFoundException {
         OperationsSelector selector = new OperationsSelector();
         selector.setFilter(filter);
         selector.setTags(providedTags);
-        return selector.doExecute(properties);
+        return selector.doExecute(request);
     }
 
     public static OperationResult doExecute(
-            Class<?> filter, IProperties properties, Selector selectorAlgo, String... providedTags)
+            Class<?> filter, IConfig request, Selector selectorAlgo, String... providedTags)
             throws NotFoundException {
         OperationsSelector selector = new OperationsSelector();
         selector.setFilter(filter);
         selector.setTags(providedTags);
         selector.addSelector(selectorAlgo);
-        return selector.doExecute(properties);
+        return selector.doExecute(request);
     }
 
     public static List<OperationResult> doExecuteAll(
-            Class<?> filter, IProperties properties, String... providedTags)
+            Class<?> filter, IConfig request, String... providedTags)
             throws NotFoundException {
         OperationsSelector selector = new OperationsSelector();
         selector.setFilter(filter);
         selector.setTags(providedTags);
-        return selector.doExecuteAll(properties);
+        return selector.doExecuteAll(request);
     }
 
     public static List<OperationResult> doExecuteAll(
-            Class<?> filter, IProperties properties, Selector selectorAlgo, String... providedTags)
+            Class<?> filter, IConfig request, Selector selectorAlgo, String... providedTags)
             throws NotFoundException {
         OperationsSelector selector = new OperationsSelector();
         selector.setFilter(filter);
         selector.setTags(providedTags);
         selector.addSelector(selectorAlgo);
-        return selector.doExecuteAll(properties);
+        return selector.doExecuteAll(request);
     }
 
     public static <T> boolean doExecute(
@@ -155,19 +162,19 @@ public class OperationUtil {
     }
 
     public static OperationResult doExecute(
-            Class<?> filter, VersionRange range, IProperties properties, String... providedTags)
+            Class<?> filter, VersionRange range, IConfig request, String... providedTags)
             throws NotFoundException {
         OperationsSelector selector = new OperationsSelector();
         selector.setFilter(filter);
         selector.setTags(providedTags);
         selector.setVersion(range);
-        return selector.doExecute(properties);
+        return selector.doExecute(request);
     }
 
     public static OperationResult doExecute(
             Class<?> filter,
             VersionRange range,
-            IProperties properties,
+            IConfig request,
             Selector selectorAlgo,
             String... providedTags)
             throws NotFoundException {
@@ -176,28 +183,28 @@ public class OperationUtil {
         selector.setTags(providedTags);
         selector.setVersion(range);
         selector.addSelector(selectorAlgo);
-        return selector.doExecute(properties);
+        return selector.doExecute(request);
     }
 
     public static List<OperationResult> doExecuteAll(
-            OperationsSelector selector, IProperties properties) throws NotFoundException {
-        return selector.doExecuteAll(properties);
+            OperationsSelector selector, IConfig request) throws NotFoundException {
+        return selector.doExecuteAll(request);
     }
 
     public static List<OperationResult> doExecuteAll(
-            Class<?> filter, VersionRange range, IProperties properties, String... providedTags)
+            Class<?> filter, VersionRange range, IConfig request, String... providedTags)
             throws NotFoundException {
         OperationsSelector selector = new OperationsSelector();
         selector.setFilter(filter);
         selector.setTags(providedTags);
         selector.setVersion(range);
-        return selector.doExecuteAll(properties);
+        return selector.doExecuteAll(request);
     }
 
     public static List<OperationResult> doExecuteAll(
             Class<?> filter,
             VersionRange range,
-            IProperties properties,
+            IConfig request,
             Selector selectorAlgo,
             String... providedTags)
             throws NotFoundException {
@@ -206,7 +213,7 @@ public class OperationUtil {
         selector.setTags(providedTags);
         selector.setVersion(range);
         selector.addSelector(selectorAlgo);
-        return selector.doExecuteAll(properties);
+        return selector.doExecuteAll(request);
     }
 
     public static <T> boolean doExecute(
@@ -355,6 +362,12 @@ public class OperationUtil {
 
     private static class OperationInvocationHandler implements InvocationHandler {
 
+        private static final TransformHelper HELPER = new TransformHelper() {
+            {
+                strategy = new JacksonTransformer();
+            }
+        };
+
         @SuppressWarnings("unused")
         private Class<?> ifc;
 
@@ -374,42 +387,61 @@ public class OperationUtil {
 
             OperationApi api = M.l(OperationApi.class);
 
-            MProperties properties = new MProperties();
-            properties.setString(OperationToIfcProxy.METHOD, method.getName());
+            IConfig request = new MConfig();
+
+            request.setString(OperationToIfcProxy.METHOD, method.getName());
             Parameter[] parameters = method.getParameters();
+            
+            ArrayNode paramsJ = MJson.createArrayNode();
             for (int i = 0; i < parameters.length; i++) {
-                if (args[i] != null) {
-                    if (isJava) {
-                        properties.put(
-                                OperationToIfcProxy.PARAMETER + i,
-                                MCast.serializeToString(args[i]));
-                        //					properties.put(OperationToIfcProxy.TYPE + i,
-                        // method.getParameters()[i].getType().getCanonicalName() );
-                        properties.put(
-                                OperationToIfcProxy.TYPE + i, OperationToIfcProxy.SERIALISED);
-                        properties.put(
-                                OperationToIfcProxy.PARAMETERORGTYPE + i,
-                                args[i].getClass().getCanonicalName());
-                    } else {
-                        String type = toType(args[i]);
-                        properties.put(OperationToIfcProxy.TYPE + i, type);
-                        properties.put(OperationToIfcProxy.PARAMETER + i, toString(type, args[i]));
-                    }
+
+                ObjectNode paramJ = MJson.createObjectNode();
+                paramsJ.add(paramJ);
+
+                paramJ.put(OperationToIfcProxy.PARAMETERTYPE, parameters[i].getType().getCanonicalName());
+
+                if (args.length >= i && args[i] != null) {
+                    paramJ.put(OperationToIfcProxy.TYPE, OperationToIfcProxy.JSON);
+                    paramJ.put(OperationToIfcProxy.PARAMETERORGTYPE, args[i].getClass().getCanonicalName());
+
+                    JsonNode argJ = MJson.pojoToJson(args[i], HELPER);
+                    paramJ.put(OperationToIfcProxy.VALUE, argJ);
                 } else {
-                    properties.put(OperationToIfcProxy.TYPE + i, OperationToIfcProxy.NULL);
+                    paramJ.put(OperationToIfcProxy.TYPE, OperationToIfcProxy.NULL);
                 }
-                properties.put(
-                        OperationToIfcProxy.PARAMETERTYPE + i,
-                        parameters[i].getType().getCanonicalName());
+
+//                if (args[i] != null) {
+//                    if (isJava) {
+//                        properties.put(
+//                                OperationToIfcProxy.PARAMETER + i,
+//                                MCast.serializeToString(args[i]));
+//                        //					properties.put(OperationToIfcProxy.TYPE + i,
+//                        // method.getParameters()[i].getType().getCanonicalName() );
+//                        properties.put(
+//                                OperationToIfcProxy.TYPE + i, OperationToIfcProxy.SERIALISED);
+//                        properties.put(
+//                                OperationToIfcProxy.PARAMETERORGTYPE + i,
+//                                args[i].getClass().getCanonicalName());
+//                    } else {
+//                        String type = toType(args[i]);
+//                        properties.put(OperationToIfcProxy.TYPE + i, type);
+//                        properties.put(OperationToIfcProxy.PARAMETER + i, toString(type, args[i]));
+//                    }
+//                } else {
+//                    properties.put(OperationToIfcProxy.TYPE + i, OperationToIfcProxy.NULL);
+//                }
+//                properties.put(
+//                        OperationToIfcProxy.PARAMETERTYPE + i,
+//                        parameters[i].getType().getCanonicalName());
             }
 
-            OperationResult res = api.doExecute(desc, properties);
+            OperationResult res = api.doExecute(desc, request);
 
             if (res == null) throw new NullPointerException();
 
             if (!res.isSuccessful()) throw new MRuntimeException(res.getMsg());
 
-            return res.getResult();
+            response = res.getResultAsConfig();
         }
 
         private String toString(String type, Object o) {

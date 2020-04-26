@@ -60,6 +60,13 @@
 	</developers>
 	
 	<modules>
+        <module>broker-api</module>
+        <module>broker-core</module>
+        <module>broker-karaf</module>
+        <module>broker-cluster</module>
+        <module>broker-prov-rs</module>
+        <module>broker-prov-jms</module>
+	<!-- 
         <module>micro-core</module>
         <module>micro-osgi</module>
         <module>micro-prov-jms</module>
@@ -67,6 +74,7 @@
         <module>micro-ext-dfs</module>
         <module>micro-ext-mailqueue</module>
         <module>micro-karaf</module>
+	 -->
      </modules>
 
 </project>

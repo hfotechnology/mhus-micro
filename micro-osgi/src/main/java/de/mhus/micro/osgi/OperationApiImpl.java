@@ -28,7 +28,6 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.MThread;
@@ -36,6 +35,7 @@ import de.mhus.lib.core.MTimerTask;
 import de.mhus.lib.core.base.service.TimerFactory;
 import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.cfg.CfgLong;
+import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
@@ -185,17 +185,17 @@ public class OperationApiImpl extends MLog implements OperationApi {
             String filter,
             VersionRange version,
             Collection<String> providedTags,
-            IProperties properties,
+            IConfig request,
             String... executeOptions)
             throws NotFoundException {
-        return register.doExecute(filter, version, providedTags, properties, executeOptions);
+        return register.doExecute(filter, version, providedTags, request, executeOptions);
     }
 
     @Override
     public OperationResult doExecute(
-            OperationDescriptor desc, IProperties properties, String... executeOptions)
+            OperationDescriptor desc, IConfig request, String... executeOptions)
             throws NotFoundException {
-        return register.doExecute(desc, properties, executeOptions);
+        return register.doExecute(desc, request, executeOptions);
     }
 
 

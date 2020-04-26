@@ -27,8 +27,10 @@ import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MFile;
-import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MXml;
+import de.mhus.lib.core.config.DefaultConfigFactory;
+import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.config.MConfig;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
@@ -137,7 +139,7 @@ public class MicroServiceCmd extends AbstractCmd {
             OperationDescriptor desc =
                     api.findOperation(PingOperation.class.getCanonicalName(), null, tags);
             long start = System.currentTimeMillis();
-            OperationResult res = api.doExecute(desc, new MProperties());
+            OperationResult res = api.doExecute(desc, new MConfig());
             long after = System.currentTimeMillis();
             if (!res.isSuccessful()) throw new MException("Ping not successful");
             IProperties map = res.getResultAsMap();
@@ -183,7 +185,7 @@ public class MicroServiceCmd extends AbstractCmd {
             System.out.println("Form   : " + xml);
         } else if (cmd.equals("execute")) {
 
-            MProperties properties = MProperties.explodeToMProperties(parameters);
+            IConfig properties = DefaultConfigFactory.readConfigFromString(parameters);
             OperationResult res = null;
             if (path.indexOf("://") >= 0) {
                 OperationAddress addr = new OperationAddress(path);

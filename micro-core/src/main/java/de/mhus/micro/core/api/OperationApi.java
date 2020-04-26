@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.strategy.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
@@ -55,12 +56,12 @@ public interface OperationApi {
             String filter,
             VersionRange version,
             Collection<String> providedTags,
-            IProperties properties,
+            IConfig request,
             String... executeOptions)
             throws NotFoundException;
 
     OperationResult doExecute(
-            OperationDescriptor desc, IProperties properties, String... executeOptions)
+            OperationDescriptor desc, IConfig request, String... executeOptions)
             throws NotFoundException;
 
     void synchronize();
