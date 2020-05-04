@@ -18,12 +18,12 @@ import org.osgi.service.component.annotations.Component;
 import de.mhus.lib.annotations.strategy.OperationService;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.base.service.IdentUtil;
+import de.mhus.lib.core.operation.AbstractOperation;
+import de.mhus.lib.core.operation.Operation;
+import de.mhus.lib.core.operation.OperationResult;
+import de.mhus.lib.core.operation.Successful;
+import de.mhus.lib.core.operation.TaskContext;
 import de.mhus.lib.core.shiro.AccessUtil;
-import de.mhus.lib.core.strategy.AbstractOperation;
-import de.mhus.lib.core.strategy.Operation;
-import de.mhus.lib.core.strategy.OperationResult;
-import de.mhus.lib.core.strategy.Successful;
-import de.mhus.lib.core.strategy.TaskContext;
 
 @Component(service = Operation.class, property = "tags=acl=*")
 @OperationService(title = "Ping")

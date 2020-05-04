@@ -8,9 +8,9 @@ import java.util.Map;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
-import de.mhus.lib.core.lang.Value;
-import de.mhus.lib.core.strategy.OperationResult;
-import de.mhus.lib.core.strategy.util.OperationResultProxy;
+import de.mhus.lib.core.operation.OperationResult;
+import de.mhus.lib.core.operation.util.OperationResultProxy;
+import de.mhus.lib.core.util.Value;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.micro.core.api.OperationAddress;

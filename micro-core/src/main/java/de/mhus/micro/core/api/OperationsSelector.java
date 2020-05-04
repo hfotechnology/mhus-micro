@@ -23,7 +23,7 @@ import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.config.MConfig;
-import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
 

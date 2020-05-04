@@ -33,7 +33,7 @@ import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.base.service.ServerIdent;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.definition.DefRoot;
-import de.mhus.lib.core.strategy.OperationDescription;
+import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.form.ModelUtil;
 import de.mhus.lib.jms.ClientJms;
 import de.mhus.lib.jms.JmsConnection;

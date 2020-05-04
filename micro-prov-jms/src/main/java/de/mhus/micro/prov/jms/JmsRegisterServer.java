@@ -28,7 +28,7 @@ import org.w3c.dom.Document;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MXml;
 import de.mhus.lib.core.definition.DefRoot;
-import de.mhus.lib.core.strategy.OperationDescription;
+import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.form.ModelUtil;
 import de.mhus.lib.jms.JmsChannel;
 import de.mhus.lib.jms.JmsDestination;

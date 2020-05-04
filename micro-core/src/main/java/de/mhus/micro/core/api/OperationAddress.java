@@ -15,7 +15,7 @@ package de.mhus.micro.core.api;
 
 import de.mhus.lib.basics.Named;
 import de.mhus.lib.basics.Versioned;
-import de.mhus.lib.core.strategy.OperationDescription;
+import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Version;
 
 /**

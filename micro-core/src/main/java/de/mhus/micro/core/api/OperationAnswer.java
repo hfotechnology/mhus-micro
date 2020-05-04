@@ -19,7 +19,7 @@ import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.config.DefaultConfigFactory;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.config.MConfig;
-import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.lib.core.util.MUri;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.core.util.VersionRange;

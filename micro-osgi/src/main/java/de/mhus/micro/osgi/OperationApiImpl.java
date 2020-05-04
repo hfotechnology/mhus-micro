@@ -36,7 +36,7 @@ import de.mhus.lib.core.base.service.TimerFactory;
 import de.mhus.lib.core.base.service.TimerIfc;
 import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.core.config.IConfig;
-import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.micro.core.MicroServiceRegistry;

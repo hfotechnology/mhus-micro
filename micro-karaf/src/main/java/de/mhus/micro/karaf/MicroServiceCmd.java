@@ -32,7 +32,7 @@ import de.mhus.lib.core.config.DefaultConfigFactory;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.config.MConfig;
 import de.mhus.lib.core.console.ConsoleTable;
-import de.mhus.lib.core.strategy.OperationResult;
+import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.form.ModelUtil;

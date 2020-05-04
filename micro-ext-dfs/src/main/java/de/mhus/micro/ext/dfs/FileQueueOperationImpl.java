@@ -21,9 +21,9 @@ import java.util.UUID;
 
 import org.osgi.service.component.annotations.Component;
 
-import de.mhus.lib.core.strategy.Operation;
-import de.mhus.lib.core.strategy.OperationDescription;
-import de.mhus.lib.core.strategy.OperationToIfcProxy;
+import de.mhus.lib.core.operation.Operation;
+import de.mhus.lib.core.operation.OperationDescription;
+import de.mhus.lib.core.operation.OperationToIfcProxy;
 import de.mhus.lib.core.util.Version;
 import de.mhus.micro.ext.api.dfs.FileInfo;
 import de.mhus.micro.ext.api.dfs.FileQueueOperation;

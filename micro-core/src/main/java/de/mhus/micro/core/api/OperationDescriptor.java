@@ -21,7 +21,7 @@ import de.mhus.lib.basics.Named;
 import de.mhus.lib.basics.Versioned;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.definition.DefRoot;
-import de.mhus.lib.core.strategy.OperationDescription;
+import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.MNls;
 import de.mhus.lib.core.util.MNlsProvider;
 import de.mhus.lib.core.util.Nls;
