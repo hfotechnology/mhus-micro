@@ -23,6 +23,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.adb.query.AQuery;
 import de.mhus.lib.adb.query.Db;
+import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.xdb.XdbService;
@@ -148,7 +149,7 @@ public class MailQueueCmd extends AbstractCmd {
                     msg.setBcc(bcc);
                     msg.setIndividual(individual);
                     MProperties prop = null;
-                    if (p != null) prop = MProperties.explodeToMProperties(p);
+                    if (p != null) prop = IProperties.explodeToMProperties(p);
                     MailMessage m = msg.toMessage();
                     mq.scheduleHtmlMail(m, prop);
                     System.out.println("Scheduled as " + Arrays.toString(m.getTasks()));

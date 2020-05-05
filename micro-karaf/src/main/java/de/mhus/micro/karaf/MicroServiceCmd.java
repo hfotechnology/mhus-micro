@@ -28,7 +28,6 @@ import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MXml;
-import de.mhus.lib.core.config.DefaultConfigFactory;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.config.MConfig;
 import de.mhus.lib.core.console.ConsoleTable;
@@ -185,7 +184,7 @@ public class MicroServiceCmd extends AbstractCmd {
             System.out.println("Form   : " + xml);
         } else if (cmd.equals("execute")) {
 
-            IConfig properties = DefaultConfigFactory.readConfigFromString(parameters);
+            IConfig properties = IConfig.readConfigFromString(parameters);
             OperationResult res = null;
             if (path.indexOf("://") >= 0) {
                 OperationAddress addr = new OperationAddress(path);
