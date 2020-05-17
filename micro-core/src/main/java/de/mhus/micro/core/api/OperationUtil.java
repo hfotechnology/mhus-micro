@@ -441,7 +441,8 @@ public class OperationUtil {
 
             if (!res.isSuccessful()) throw new MRuntimeException(res.getMsg());
 
-            response = res.getResultAsConfig();
+            IConfig response = res.getResultAsConfig();
+            return null; //XXX WRONG!!!!
         }
 
         private String toString(String type, Object o) {
