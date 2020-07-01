@@ -22,7 +22,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	    <parent>
         <groupId>de.mhus.lib</groupId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.1.0-SNAPSHOT</version>
         <artifactId>mhus-karaf</artifactId>
     </parent>
 	<groupId>de.mhus.micro</groupId>
@@ -30,7 +30,7 @@
 	<version>7.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>mhus-rest</name>
-	<description>Rest framework for deep rest structures.</description>
+	<description>Framework to work with micro services</description>
 	<url>http://www.mhus.de</url>
     <properties>
        <cherry-reactive.version>${project.version}</cherry-reactive.version>
@@ -46,8 +46,8 @@
 	</licenses>
 	
 	<scm>
-		<url>https://github.com/mhus/cherry-reactive</url>
-		<connection>scm:git:https://github.com/mhus/cherry-reactive/</connection>
+		<url>https://github.com/mhus/mhus-micro</url>
+		<connection>scm:git:https://github.com/mhus/mhus-micro/</connection>
 	</scm>
 	
 	<developers>
@@ -60,21 +60,12 @@
 	</developers>
 	
 	<modules>
-        <module>broker-api</module>
-        <module>broker-core</module>
-        <module>broker-karaf</module>
-        <module>broker-cluster</module>
-        <module>broker-prov-rs</module>
-        <module>broker-prov-jms</module>
-	<!-- 
-        <module>micro-core</module>
-        <module>micro-osgi</module>
-        <module>micro-prov-jms</module>
-        <module>micro-ext-api</module>
-        <module>micro-ext-dfs</module>
-        <module>micro-ext-mailqueue</module>
-        <module>micro-karaf</module>
-	 -->
+        <module>micro-client-api</module>
+        <module>micro-client-impl</module>
+        <module>micro-client-docker</module>
+        <!-- 
+        <module>micro-client-k8s</module>
+         -->
      </modules>
 
 </project>
