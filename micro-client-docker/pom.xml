@@ -45,14 +45,15 @@
                             *;resolution:=optional
 						</Import-Package>
 						<Private-Package>
-						    com.spotify.docker.client.*,
+						    com.amihaiemil.docker.*,
 						    jnr.*,
-						    com.kenai.*,
-						    org.apache.commons.lang.*
+						    jni.*,
+						    javax.json.*,
+						    com.kenai.*
 						</Private-Package>
 						<Service-Component>*</Service-Component>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Embed-Dependency>docker-client</Embed-Dependency>
+                        <Embed-Dependency>docker-java-api,javax.json</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
@@ -87,11 +88,16 @@
             <artifactId>micro-client-api</artifactId>
         </dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.spotify/docker-client -->
 		<dependency>
-		    <groupId>com.spotify</groupId>
-		    <artifactId>docker-client</artifactId>
-		    <version>8.16.0</version>
+		    <groupId>com.amihaiemil.web</groupId>
+		    <artifactId>docker-java-api</artifactId>
+		    <version>0.0.12</version>
+		</dependency>		
+		<!-- https://mvnrepository.com/artifact/org.glassfish/javax.json -->
+		<dependency>
+		    <groupId>org.glassfish</groupId>
+		    <artifactId>javax.json</artifactId>
+		    <version>1.1.4</version>
 		</dependency>
 		
         

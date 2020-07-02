@@ -1,0 +1,25 @@
+
+----
+
+docker run -it \
+ -v ~/.m2:/home/user/.m2\
+ -p 15006:5005\
+ -p 18182:8181\
+ --name karaf1\
+ --group-add root\
+ -v /var/run/docker.sock:/var/run/docker.sock\
+ --privileged\
+ mhus/apache-karaf:4.2.6_04 debug
+
+feature:repo-add mvn:org.apache.shiro/shiro-features/1.5.1/xml/features
+feature:repo-add mvn:de.mhus.osgi/mhus-features/7.1.0-SNAPSHOT/xml/features
+feature:repo-add mvn:de.mhus.osgi/dev-features/7.1.0-SNAPSHOT/xml/features
+
+feature:install mhu-base
+
+install -s mvn:de.mhus.micro/micro-client-api/7.0.0-SNAPSHOT
+install -s mvn:de.mhus.micro/micro-client-impl/7.0.0-SNAPSHOT
+install -s mvn:de.mhus.micro/micro-client-docker/7.0.0-SNAPSHOT
+
+
+----
