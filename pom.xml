@@ -23,7 +23,7 @@
 	    <parent>
         <groupId>de.mhus.lib</groupId>
         <version>7.1.0-SNAPSHOT</version>
-        <artifactId>mhus-karaf</artifactId>
+        <artifactId>mhus-karaf-oss</artifactId>
     </parent>
 	<groupId>de.mhus.micro</groupId>
 	<artifactId>mhus-micro</artifactId>
