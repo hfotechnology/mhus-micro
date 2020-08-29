@@ -60,9 +60,10 @@
 	</developers>
 	
 	<modules>
-        <module>micro-client-api</module>
+        <module>micro-api</module>
         <module>micro-client-impl</module>
-        <module>micro-client-docker</module>
+        <module>micro-execute-rest</module>
+        <module>micro-discover-redis</module>
         <!-- 
         <module>micro-client-k8s</module>
          -->
@@ -74,7 +75,7 @@
             <!-- until micros first release -->
             <dependency>
                 <groupId>de.mhus.micro</groupId>
-                <artifactId>micro-client-api</artifactId>
+                <artifactId>micro-api</artifactId>
                 <version>${mhus-micro.version}</version>
             </dependency>
 
