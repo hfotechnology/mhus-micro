@@ -64,6 +64,9 @@
         <module>micro-client-impl</module>
         <module>micro-execute-rest</module>
         <module>micro-discover-redis</module>
+        <module>micro-publisher-redis</module>
+        <module>micro-oper-impl</module>
+        <module>micro-oper-rest</module>
         <!-- 
         <module>micro-client-k8s</module>
          -->
