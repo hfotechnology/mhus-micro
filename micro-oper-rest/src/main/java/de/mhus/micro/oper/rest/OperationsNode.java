@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -15,10 +17,13 @@ import de.mhus.lib.core.MJson;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.io.http.MHttp;
 import de.mhus.lib.core.operation.Operation;
+import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.lib.core.operation.TaskContext;
 import de.mhus.lib.errors.NotSupportedException;
-import de.mhus.micro.oper.impl.OperationsAdmin;
+import de.mhus.micro.api.MicroConst;
+import de.mhus.micro.api.MicroUtil;
+import de.mhus.micro.api.operation.OperationsAdmin;
 import de.mhus.rest.core.CallContext;
 import de.mhus.rest.core.annotation.RestNode;
 import de.mhus.rest.core.api.Node;
@@ -32,8 +37,11 @@ import de.mhus.rest.core.result.PlainTextResult;
 import de.mhus.rest.osgi.PublicRestNode;
 
 @RestNode(name = "operation", parentNode = PublicRestNode.class)
-@Component(immediate = true, service = RestNodeService.class)
-public class OperationsNode extends AbstractNode {
+@Component(immediate = true,property = {
+        OperationsAdmin.EVENT_TOPICS
+        },
+        service = {RestNodeService.class, EventHandler.class})
+public class OperationsNode extends AbstractNode implements EventHandler {
 
     @Override
     public Node lookup(List<String> parts, CallContext callContext) throws Exception {
@@ -128,6 +136,25 @@ public class OperationsNode extends AbstractNode {
     @Override
     public RestResult doAction(CallContext context) throws Exception {
         throw new NotSupportedException();
+    }
+
+    @Override
+    public void handleEvent(Event event) {
+        OperationDescription desc = (OperationDescription) event.getProperty(OperationsAdmin.EVENT_PROPERTY_DESCRIPTION);
+        if (desc == null) return;
+        
+        String topic = event.getTopic();
+        if (OperationsAdmin.EVENT_TOPIC_ADD.equals(topic)) {
+            OperationDescription desc2 = new OperationDescription(desc);
+            desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
+            MicroUtil.firePushAdd(desc2);
+        } else
+        if (OperationsAdmin.EVENT_TOPIC_REMOVE.equals(topic)) {
+            OperationDescription desc2 = new OperationDescription(desc);
+            desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
+            MicroUtil.firePushRemove(desc2);
+        }
+            
     }
 
 }

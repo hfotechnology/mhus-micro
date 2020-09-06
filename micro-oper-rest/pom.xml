@@ -81,7 +81,7 @@
 
         <dependency>
             <groupId>de.mhus.micro</groupId>
-            <artifactId>micro-oper-impl</artifactId>
+            <artifactId>micro-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
         

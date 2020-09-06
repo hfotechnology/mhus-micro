@@ -1,4 +1,4 @@
-package de.mhus.micro.oper.impl;
+package de.mhus.micro.impl;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,12 +12,16 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-    
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.operation.Operation;
 import de.mhus.lib.core.util.MapList;
 import de.mhus.lib.core.util.VersionRange;
+import de.mhus.micro.api.operation.OperationsAdmin;
 import de.mhus.osgi.api.util.MServiceTracker;
 
 @Component(immediate = true)
@@ -43,6 +47,15 @@ public class OperationsAdminImpl extends MLog implements OperationsAdmin {
                         operationsByPath.removeEntry(service.getDescription().getPath(), service);
                     }
                 } catch (Throwable t) {}
+
+                EventAdmin eventAdmin = M.l(EventAdmin.class);
+                if (eventAdmin == null) {
+                    log().d("removeService: EventAdmin not found");
+                } else {
+                    Map<String, Object> prop = new HashMap<>();
+                    prop.put(OperationsAdmin.EVENT_PROPERTY_DESCRIPTION, service.getDescription());
+                    eventAdmin.postEvent(new Event(OperationsAdmin.EVENT_TOPIC_REMOVE, prop));
+                }
             }
 
             @Override
@@ -56,6 +69,16 @@ public class OperationsAdminImpl extends MLog implements OperationsAdmin {
                         operationsByPath.putEntry(service.getDescription().getPath(), service);
                     }
                 } catch (Throwable t) {}
+
+                EventAdmin eventAdmin = M.l(EventAdmin.class);
+                if (eventAdmin == null) {
+                    log().d("removeService: EventAdmin not found");
+                } else {
+                    Map<String, Object> prop = new HashMap<>();
+                    prop.put(OperationsAdmin.EVENT_PROPERTY_DESCRIPTION, service.getDescription());
+                    prop.put(OperationsAdmin.EVENT_PROPERTY_OPERATION, service);
+                    eventAdmin.postEvent(new Event(OperationsAdmin.EVENT_TOPIC_ADD, prop));
+                }
             }
         };
         tracker.start();

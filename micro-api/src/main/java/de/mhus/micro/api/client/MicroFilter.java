@@ -4,7 +4,7 @@ import de.mhus.lib.core.operation.OperationDescription;
 
 public class MicroFilter {
 
-    private String path;
+    protected String path;
 
     public MicroFilter(String path) {
         this.path = path;
