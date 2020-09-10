@@ -69,7 +69,7 @@ public class OperationsNode extends AbstractNode implements EventHandler, MicroP
             OperationDescription desc = item.getDescription();
             OperationDescription desc2 = new OperationDescription(desc);
             desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
-            desc2.putLabel(MicroConst.REST_URL, CFG_URL.value());
+            desc2.putLabel(MicroConst.REST_URL, CFG_URL.value() + "/" + desc.getPath() + "/" + desc.getVersionString());
             desc2.putLabel(MicroConst.REST_METHOD, "POST");
             descriptions.put(desc2.getUuid(), desc2);
             MicroUtil.firePushAdd(desc2);

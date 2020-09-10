@@ -13,6 +13,7 @@ import org.apache.http.entity.StringEntity;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MString;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.config.JsonConfigBuilder;
 import de.mhus.lib.core.config.MConfig;
@@ -50,7 +51,7 @@ public class RestOperation extends MLog  implements MicroOperation {
             
                 // TODO different transport types - xml, form properties - pluggable?
                 String argJson = IConfig.toPrettyJsonString(arguments);
-                post.setEntity(new StringEntity(argJson, MHttp.CONTENT_TYPE_JSON));
+                post.setEntity(new StringEntity(argJson, MString.CHARSET_UTF_8));
                 res = client.execute(post);
             } else
             if (MHttp.METHOD_PUT.equals(method)) {
@@ -58,7 +59,7 @@ public class RestOperation extends MLog  implements MicroOperation {
             
                 // TODO different transport types - xml, form properties - pluggable?
                 String argJson = IConfig.toPrettyJsonString(arguments);
-                post.setEntity(new StringEntity(argJson, MHttp.CONTENT_TYPE_JSON));
+                post.setEntity(new StringEntity(argJson, MString.CHARSET_UTF_8));
                 res = client.execute(post);
             } 
 //            else
@@ -85,7 +86,7 @@ public class RestOperation extends MLog  implements MicroOperation {
             HttpEntity entry = res.getEntity();
             Header type = entry.getContentType();
             // TODO different return formats - xml, plain, stream - pluggable?
-            if (MHttp.CONTENT_TYPE_JSON.equals(type.getValue())) {
+            if (type.getValue().startsWith(MHttp.CONTENT_TYPE_JSON)) {
                 InputStream is = entry.getContent();
                 IConfig resJson = new JsonConfigBuilder().read(is);
                 return resJson;
