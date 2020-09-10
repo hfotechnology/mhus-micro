@@ -1,10 +1,16 @@
+
 package de.mhus.micro.oper.rest;
 
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -15,7 +21,10 @@ import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MJson;
 import de.mhus.lib.core.MValidator;
-import de.mhus.lib.core.io.http.MHttp;
+import de.mhus.lib.core.cfg.CfgString;
+import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.config.JsonConfigBuilder;
+import de.mhus.lib.core.config.MConfig;
 import de.mhus.lib.core.operation.Operation;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.operation.OperationResult;
@@ -24,6 +33,7 @@ import de.mhus.lib.errors.NotSupportedException;
 import de.mhus.micro.api.MicroConst;
 import de.mhus.micro.api.MicroUtil;
 import de.mhus.micro.api.operation.OperationsAdmin;
+import de.mhus.micro.api.server.MicroProvider;
 import de.mhus.rest.core.CallContext;
 import de.mhus.rest.core.annotation.RestNode;
 import de.mhus.rest.core.api.Node;
@@ -33,15 +43,38 @@ import de.mhus.rest.core.api.RestResult;
 import de.mhus.rest.core.node.AbstractNode;
 import de.mhus.rest.core.result.ErrorJsonResult;
 import de.mhus.rest.core.result.JsonResult;
-import de.mhus.rest.core.result.PlainTextResult;
 import de.mhus.rest.osgi.PublicRestNode;
 
 @RestNode(name = "operation", parentNode = PublicRestNode.class)
 @Component(immediate = true,property = {
         OperationsAdmin.EVENT_TOPICS
         },
-        service = {RestNodeService.class, EventHandler.class})
-public class OperationsNode extends AbstractNode implements EventHandler {
+        service = {RestNodeService.class, EventHandler.class, MicroProvider.class})
+public class OperationsNode extends AbstractNode implements EventHandler, MicroProvider {
+
+    private CfgString CFG_URL = new CfgString(OperationsNode.class, "url", "http://localhost:8181/rest/public/operation");
+    private Map<UUID,OperationDescription> descriptions = Collections.synchronizedMap(new HashMap<>());
+    
+    @Reference
+    private OperationsAdmin admin;
+    
+    @Activate
+    public void doActivate() {
+        reload();
+    }
+    
+    @Override
+    public void reload() {
+        for (Operation item : admin.list()) {
+            OperationDescription desc = item.getDescription();
+            OperationDescription desc2 = new OperationDescription(desc);
+            desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
+            desc2.putLabel(MicroConst.REST_URL, CFG_URL.value());
+            desc2.putLabel(MicroConst.REST_METHOD, "POST");
+            descriptions.put(desc2.getUuid(), desc2);
+            MicroUtil.firePushAdd(desc2);
+        }
+    }
 
     @Override
     public Node lookup(List<String> parts, CallContext callContext) throws Exception {
@@ -89,24 +122,41 @@ public class OperationsNode extends AbstractNode implements EventHandler {
         OperationResult res = oper.doExecute(taskContext);
         
         Object r = res.getResult();
+        
+        IConfig outter = new MConfig();
+        outter.setBoolean("successful", res.isSuccessful());
+        outter.setString("msg", res.getMsg());
+        outter.setInt("rc", res.getReturnCode());
+
         if (r != null) {
             // map result to rest result
-            if (r instanceof RestResult)
-                return (RestResult)r;
+            if (r instanceof Map) {
+                IConfig cfg = IConfig.readFromMap((Map<?, ?>) r);
+                outter.addObject("result", cfg);
+            } else
+            if (r instanceof IConfig) {
+                IConfig cfg = (IConfig)r;
+                outter.addObject("result", cfg);
+            } else
             if (r instanceof ObjectNode) {
-                JsonResult out = new JsonResult();
-                out.setJson((JsonNode)r);
-                return out;
+                IConfig cfg = new JsonConfigBuilder().fromJson((JsonNode)r);
+                outter.addObject("result", cfg);
+            } else
+            if (r instanceof String) {
+                outter.setString("result", (String)r);
+            } else {
+                JsonNode json = MJson.pojoToJson(r);
+                IConfig cfg = new JsonConfigBuilder().fromJson(json);
+                outter.addObject("result", cfg);
             }
-            if (r instanceof String)
-                return new PlainTextResult((String)r, MHttp.findMimeType((String)r, MFile.DEFAULT_MIME));
-            
-            JsonNode json = MJson.pojoToJson(r);
+
+            String content = IConfig.toPrettyJsonString(outter);
+            JsonNode json = MJson.load(content);
             JsonResult out = new JsonResult();
             out.setJson(json);
             return out;
         }
-        
+
         return new ErrorJsonResult(res.getReturnCode(), res.getMsg());
     }
 
@@ -147,14 +197,24 @@ public class OperationsNode extends AbstractNode implements EventHandler {
         if (OperationsAdmin.EVENT_TOPIC_ADD.equals(topic)) {
             OperationDescription desc2 = new OperationDescription(desc);
             desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
+            descriptions.put(desc2.getUuid(), desc2);
             MicroUtil.firePushAdd(desc2);
         } else
         if (OperationsAdmin.EVENT_TOPIC_REMOVE.equals(topic)) {
-            OperationDescription desc2 = new OperationDescription(desc);
-            desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
+            OperationDescription desc2 = descriptions.get(desc.getUuid());
+            if (desc2 == null) {
+                desc2 = new OperationDescription(desc);
+                desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
+            }
             MicroUtil.firePushRemove(desc2);
+            descriptions.remove(desc2.getUuid());
         }
-            
+
+    }
+
+    @Override
+    public void provided(List<OperationDescription> list) {
+        descriptions.values().forEach(d -> list.add(d));
     }
 
 }

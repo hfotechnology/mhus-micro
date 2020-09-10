@@ -18,11 +18,13 @@ import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.micro.api.MicroApi;
+import de.mhus.micro.api.MicroConst;
 import de.mhus.micro.api.client.MicroDiscoverer;
 import de.mhus.micro.api.client.MicroExecutor;
 import de.mhus.micro.api.client.MicroFilter;
 import de.mhus.micro.api.client.MicroOperation;
 import de.mhus.micro.api.client.MicroResult;
+import de.mhus.micro.api.server.MicroProvider;
 import de.mhus.micro.api.server.MicroPusher;
 import de.mhus.osgi.api.MOsgi;
 import de.mhus.osgi.api.util.MServiceTracker;
@@ -82,31 +84,45 @@ public class MicroApiImpl extends MLog implements MicroApi {
     }
 
     @Override
-    public List<MicroResult> execute(MicroFilter filter, IConfig arguments, IProperties properties) {
+    public List<MicroResult> execute(MicroFilter filter, IConfig arguments, IProperties properties) throws Exception {
         ArrayList<MicroOperation> list = new ArrayList<>();
         operations(filter, list);
         List<MicroResult> out = new ArrayList<>();
+
+        boolean broadcast = MicroConst.EXEC_BROADCAST_DEFAULT;
+        if (properties != null) {
+            broadcast = properties.getBoolean(MicroConst.EXEC_BROADCAST, broadcast);
+        }
+
         for (MicroOperation oper : list) {
-            IConfig res = oper.execute(arguments);
-            if (res != null)
+            IConfig res = oper.execute(arguments, properties);
+            if (res != null) {
                 out.add(new MicroResult(oper.getDescription(), res));
+                if (!broadcast)
+                    return out;
+            }
         }
         return out;
     }
 
     @Override
     public void operations(MicroFilter filter, List<MicroOperation> results) {
-        executors.forEach(p -> p.list(filter, results) );
+        executors.forEach(p -> p.find(filter, results) );
     }
 
     @Override
     public void discover(MicroFilter filter, List<OperationDescription> results) {
-        discoverers.forEach(d -> d.list(filter, results));
+        discoverers.forEach(d -> d.discover(filter, results));
     }
     
     @Override
     public List<MicroPusher> getPushers() {
         return MOsgi.getServices(MicroPusher.class, null);
+    }
+
+    @Override
+    public List<MicroProvider> getProviders() {
+        return MOsgi.getServices(MicroProvider.class, null);
     }
 
 }

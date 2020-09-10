@@ -2,20 +2,15 @@ package de.mhus.micro.api.client;
 
 import de.mhus.lib.core.operation.OperationDescription;
 
-public class MicroFilter {
+public interface MicroFilter {
 
-    protected String path;
+    public static final MicroFilter GET_ALL = new MicroFilter() {
+        @Override
+        public boolean matches(OperationDescription desc) {
+            return true;
+        }
+    };
 
-    public MicroFilter(String path) {
-        this.path = path;
-    }
-    
-    public String getPath() {
-        return path;
-    }
-    
-    public boolean matches(OperationDescription desc) {
-        return path.equals(desc.getPath());
-    }
-    
+     boolean matches(OperationDescription desc);
+
 }

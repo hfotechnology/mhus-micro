@@ -9,7 +9,7 @@ import de.mhus.micro.api.client.MicroFilter;
 public class RedisDiscoverer implements MicroDiscoverer {
 
     @Override
-    public void list(MicroFilter filter, List<OperationDescription> results) {
+    public void discover(MicroFilter filter, List<OperationDescription> results) {
         
     }
 

@@ -68,16 +68,4 @@
         <module>micro-oper-rest</module>
      </modules>
 
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- until micros first release -->
-            <dependency>
-                <groupId>de.mhus.micro</groupId>
-                <artifactId>micro-api</artifactId>
-                <version>${mhus-micro.version}</version>
-            </dependency>
-
-        </dependencies>
-    </dependencyManagement>
 </project>

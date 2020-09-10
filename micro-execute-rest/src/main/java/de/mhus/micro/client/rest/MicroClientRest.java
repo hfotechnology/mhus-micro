@@ -1,5 +1,6 @@
 package de.mhus.micro.client.rest;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -7,13 +8,17 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.http.client.HttpClient;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.io.http.MHttpClientBuilder;
 import de.mhus.lib.core.operation.OperationDescription;
+import de.mhus.micro.api.MicroApi;
 import de.mhus.micro.api.MicroConst;
 import de.mhus.micro.api.MicroUtil;
 import de.mhus.micro.api.client.MicroDiscoverer;
@@ -31,8 +36,23 @@ public class MicroClientRest extends MLog implements MicroExecutor, EventHandler
     private HttpClient client = new MHttpClientBuilder().getHttpClient();
     private Map<UUID,RestOperation> operations = Collections.synchronizedMap(new HashMap<>());
 
+    @Reference
+    private MicroApi api;
+    
+    @Activate
+    public void doActivate() {
+        api = M.l(MicroApi.class);
+        ArrayList<OperationDescription> list = new ArrayList<>();
+        api.discover(new FilterTransport(MicroConst.REST_TRANSPORT), list);
+        for (OperationDescription desc : list) {
+            RestOperation oper = new RestOperation(desc, client);
+            operations.put(desc.getUuid(), oper);
+            MicroUtil.fireOperationAdd(oper);
+        }
+    }
+    
     @Override
-    public void list(MicroFilter filter, List<MicroOperation> results) {
+    public void find(MicroFilter filter, List<MicroOperation> results) {
         operations.forEach((i,o) -> {
             if (filter.matches(o.getDescription()))
                 results.add(o);
@@ -48,7 +68,7 @@ public class MicroClientRest extends MLog implements MicroExecutor, EventHandler
         if (descParam == null) return;
         String transType = descParam.get(MicroConst.DESC_LABEL_TRANSPORT_TYPE);
         if (!MicroConst.REST_TRANSPORT.equals(transType)) return;
-        String uri = descParam.get(MicroConst.REST_URI);
+        String uri = descParam.get(MicroConst.REST_URL);
         if (uri == null) return;
         
         if (event.getTopic().equals(MicroDiscoverer.EVENT_TOPIC_ADD)) {

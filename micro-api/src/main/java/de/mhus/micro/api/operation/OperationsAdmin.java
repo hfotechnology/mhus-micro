@@ -11,10 +11,9 @@ import de.mhus.lib.core.operation.Operation;
 public interface OperationsAdmin {
 
     String EVENT_PROPERTY_DESCRIPTION = "description";
-    String EVENT_PROPERTY_OPERATION = "operation";
-    String EVENT_TOPIC_REMOVE = "de.mhus.micro.oper.impl.OperationsAdmin/remove";
-    String EVENT_TOPIC_ADD = "de.mhus.micro.oper.impl.OperationsAdmin/add";
-    String EVENT_TOPICS = EventConstants.EVENT + "=" + "de.mhus.micro.oper.impl.OperationsAdmin/*";
+    String EVENT_TOPIC_REMOVE = "de/mhus/micro/api/client/OperationsAdmin/remove";
+    String EVENT_TOPIC_ADD = "de/mhus/micro/api/client/OperationsAdmin/add";
+    String EVENT_TOPICS = EventConstants.EVENT_TOPIC + "=" + "de/mhus/micro/api/client/OperationsAdmin/*";
 
     void list(List<Operation> results);
     

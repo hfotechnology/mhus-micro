@@ -11,12 +11,11 @@ import de.mhus.lib.core.console.ConsoleTable;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.micro.api.MicroApi;
 import de.mhus.micro.api.client.MicroFilter;
-import de.mhus.micro.api.client.MicroOperation;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 
-@Command(scope = "micro", name = "operation-list", description = "Operations list")
+@Command(scope = "micro", name = "operation-discover", description = "Operations list")
 @Service
-public class CmdOperationList extends AbstractCmd {
+public class CmdDiscoverList extends AbstractCmd {
 
     @Argument(
             index = 0,
@@ -30,18 +29,17 @@ public class CmdOperationList extends AbstractCmd {
     public Object execute2() throws Exception {
         MicroApi api = M.l(MicroApi.class);
         ConsoleTable out = new ConsoleTable(tblOpt);
-        out.setHeaderValues("Path","Version","Labels","Id","Executor");
-        ArrayList<MicroOperation> results = new ArrayList<>();
+        out.setHeaderValues("Path","Version","Labels","Id");
+        ArrayList<OperationDescription> results = new ArrayList<>();
         MicroFilter f = new MicroFilter() {
             @Override
             public boolean matches(OperationDescription desc) {
                 return filter == null || desc.getPath().matches(filter);
             }
         };
-        api.operations(f, results);
-        for (MicroOperation oper : results) {
-            OperationDescription desc = oper.getDescription();
-            out.addRowValues(desc.getPath(),desc.getVersionString(),desc.getLabels(),desc.getUuid(), oper.getClass().getCanonicalName());
+        api.discover(f, results);
+        for (OperationDescription desc : results) {
+            out.addRowValues(desc.getPath(),desc.getVersionString(),desc.getLabels(),desc.getUuid());
         }
         out.print();
         return null;

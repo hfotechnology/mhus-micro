@@ -19,4 +19,10 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
         
     }
 
+    @Override
+    public void reload() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

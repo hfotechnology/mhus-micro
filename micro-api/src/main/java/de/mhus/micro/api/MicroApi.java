@@ -8,6 +8,7 @@ import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.micro.api.client.MicroFilter;
 import de.mhus.micro.api.client.MicroOperation;
 import de.mhus.micro.api.client.MicroResult;
+import de.mhus.micro.api.server.MicroProvider;
 import de.mhus.micro.api.server.MicroPusher;
 
 public interface MicroApi {
@@ -20,8 +21,9 @@ public interface MicroApi {
      * @param arguments
      * @param properties 
      * @return list of results
+     * @throws Exception 
      */
-    List<MicroResult> execute(MicroFilter filter, IConfig arguments, IProperties properties);
+    List<MicroResult> execute(MicroFilter filter, IConfig arguments, IProperties properties) throws Exception;
     
     /**
      * Return all operations that match the filter.
@@ -40,5 +42,11 @@ public interface MicroApi {
     void discover(MicroFilter filter, List<OperationDescription> results);
 
     List<MicroPusher> getPushers();
-    
+
+    /**
+     * Return all known providers.
+     * @return Providers
+     */
+    List<MicroProvider> getProviders();
+
 }

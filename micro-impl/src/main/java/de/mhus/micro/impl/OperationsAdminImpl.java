@@ -76,7 +76,6 @@ public class OperationsAdminImpl extends MLog implements OperationsAdmin {
                 } else {
                     Map<String, Object> prop = new HashMap<>();
                     prop.put(OperationsAdmin.EVENT_PROPERTY_DESCRIPTION, service.getDescription());
-                    prop.put(OperationsAdmin.EVENT_PROPERTY_OPERATION, service);
                     eventAdmin.postEvent(new Event(OperationsAdmin.EVENT_TOPIC_ADD, prop));
                 }
             }

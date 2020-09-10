@@ -1,0 +1,53 @@
+
+Test using docker
+
+----
+
+docker run -it \
+ -v ~/.m2:/home/user/.m2\
+ -p 15006:5005\
+ -p 18182:8181\
+ --name karaf1\
+ mhus/apache-karaf:4.2.6_04 debug
+
+feature:repo-add mvn:org.apache.shiro/shiro-features/1.5.1/xml/features
+feature:repo-add mvn:de.mhus.osgi/mhus-features/7.2.0-SNAPSHOT/xml/features
+#feature:repo-add mvn:de.mhus.osgi/dev-features/7.2.0-SNAPSHOT/xml/features
+
+feature:install eventadmin
+
+feature:install mhu-micro
+
+install -s mvn:de.mhus.osgi/dev-micro/7.2.0-SNAPSHOT
+
+
+
+Rest provider:
+
+feature:install mhu-rest
+install -s mvn:de.mhus.micro/micro-oper-rest/7.0.0-SNAPSHOT
+
+sb-create de.mhus.rest.osgi.RestServlet
+
+Test in browser:
+
+http://localhost:18182/rest/public/operation/de.mhus.osgi.dev.critical.micro.Hello/1.0.0?_method=POST
+
+http://localhost:18182/rest/public/operation/de.mhus.osgi.dev.critical.micro.Hello/0.0.0?load={next:"x"}
+
+
+
+Discover via file system:
+
+sb-create de.mhus.micro.impl.FsPusher
+
+sb-create de.mhus.micro.impl.FsDiscoverer
+
+
+
+Rest executor:
+
+install -s mvn:de.mhus.micro/micro-execute-rest/7.0.0-SNAPSHOT
+
+
+----

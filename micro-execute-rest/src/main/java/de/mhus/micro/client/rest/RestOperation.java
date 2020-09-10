@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 
+import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.config.IConfig;
@@ -33,12 +34,12 @@ public class RestOperation extends MLog  implements MicroOperation {
     public RestOperation(OperationDescription description, HttpClient client) {
         this.description = description;
         this.client = client;
-        this.uri = description.getLabels().get(MicroConst.REST_URI);
+        this.uri = description.getLabels().get(MicroConst.REST_URL);
         this.method = description.getLabels().getOrDefault(MicroConst.REST_METHOD, MHttp.METHOD_POST);
     }
 
     @Override
-    public IConfig execute(IConfig arguments) {
+    public IConfig execute(IConfig arguments, IProperties properties) {
         HttpResponse res = null;
         try {
             if (uri.contains("{"))
