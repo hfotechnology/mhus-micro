@@ -30,7 +30,6 @@ public class RestOperation extends MLog  implements MicroOperation {
     private HttpClient client;
     private String uri;
     private Object method;
-    
 
     public RestOperation(OperationDescription description, HttpClient client) {
         this.description = description;
@@ -89,6 +88,12 @@ public class RestOperation extends MLog  implements MicroOperation {
             if (type.getValue().startsWith(MHttp.CONTENT_TYPE_JSON)) {
                 InputStream is = entry.getContent();
                 IConfig resJson = new JsonConfigBuilder().read(is);
+
+                if (properties != null)
+                    properties.put("result", resJson);
+
+                if (MHttp.getHeader(res, "Encapsulated", "").equals("result"))
+                    return resJson.getObjectOrNull("result");
                 return resJson;
             }
             if (MHttp.CONTENT_TYPE_TEXT.equals(type.getValue())) {

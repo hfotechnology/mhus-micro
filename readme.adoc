@@ -3,16 +3,19 @@ Test using docker
 
 ----
 
+mkdir ~/tmp/micro_discovery
+
 docker run -it \
  -v ~/.m2:/home/user/.m2\
  -p 15006:5005\
  -p 18182:8181\
+ -h karaf1\
  --name karaf1\
+ -v ~/tmp/micro_discovery:/opt/karaf/micro_discovery\
  mhus/apache-karaf:4.2.6_04 debug
 
 feature:repo-add mvn:org.apache.shiro/shiro-features/1.5.1/xml/features
 feature:repo-add mvn:de.mhus.osgi/mhus-features/7.2.0-SNAPSHOT/xml/features
-#feature:repo-add mvn:de.mhus.osgi/dev-features/7.2.0-SNAPSHOT/xml/features
 
 feature:install eventadmin
 
@@ -51,3 +54,35 @@ install -s mvn:de.mhus.micro/micro-execute-rest/7.0.0-SNAPSHOT
 
 
 ----
+
+Test with second client:
+
+----
+
+docker run -it \
+ -v ~/.m2:/home/user/.m2\
+ -p 15007:5005\
+ -p 18183:8181\
+ -h karaf2\
+ --name karaf2\
+ -v ~/tmp/micro_discovery:/opt/karaf/micro_discovery\
+ --link karaf1:karaf1 \
+ mhus/apache-karaf:4.2.6_04 debug
+
+
+
+feature:repo-add mvn:org.apache.shiro/shiro-features/1.5.1/xml/features
+feature:repo-add mvn:de.mhus.osgi/mhus-features/7.2.0-SNAPSHOT/xml/features
+
+feature:install eventadmin
+
+feature:install mhu-micro
+
+install -s mvn:de.mhus.micro/micro-execute-rest/7.0.0-SNAPSHOT
+
+sb-create de.mhus.micro.impl.FsDiscoverer
+
+
+----
+
+

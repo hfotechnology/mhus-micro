@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
@@ -36,7 +37,7 @@ import de.mhus.osgi.api.MOsgi;
  */
 @Component(immediate = true, service = { MicroPusher.class, MicroDiscoverer.class, MicroExecutor.class,
         EventHandler.class }, property = { EventConstants.EVENT_TOPIC + "=" + "de/mhus/micro/api/*" })
-public class OperationsLoopback extends MLog implements MicroPusher, MicroDiscoverer, MicroExecutor, EventHandler {
+public class LocalOperationsLoopback extends MLog implements MicroPusher, MicroDiscoverer, MicroExecutor, EventHandler {
 
     private Map<UUID, LocalOperation> operations = Collections.synchronizedMap(new HashMap<>());
     
@@ -46,18 +47,21 @@ public class OperationsLoopback extends MLog implements MicroPusher, MicroDiscov
     @Activate
     public void doActivate(ComponentContext ctx) {
         MOsgi.runAfterActivation(ctx, c -> {
-            ArrayList<Operation> list = new ArrayList<>();
-            api.list(list);
-            list.forEach(o -> {
-                OperationDescription desc2 = new OperationDescription(o.getDescription());
-                desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.LOCAL_TRANSPORT);
-                MicroUtil.firePushAdd(desc2);
-            });
+            reload();
         });
+    }
+    
+    @Deactivate
+    public void doDeactivate() {
+        if (operations == null) return;
+        operations.forEach((k,o) -> MicroUtil.firePushRemove(o.getDescription() ) );
+        operations = null;
     }
 
     @Override
     public void handleEvent(Event event) {
+        if (operations == null) return;
+        
         OperationDescription desc = (OperationDescription) event.getProperty(OperationsAdmin.EVENT_PROPERTY_DESCRIPTION);
         if (desc == null) return;
         
@@ -92,6 +96,8 @@ public class OperationsLoopback extends MLog implements MicroPusher, MicroDiscov
 
     @Override
     public void find(MicroFilter filter, List<MicroOperation> results) {
+        if (operations == null) return;
+        
         operations.forEach((id,o) -> {
             if (filter.matches(o.getDescription()))
                 results.add(o);
@@ -100,6 +106,8 @@ public class OperationsLoopback extends MLog implements MicroPusher, MicroDiscov
 
     @Override
     public void discover(MicroFilter filter, List<OperationDescription> results) {
+        if (operations == null) return;
+        
         operations.forEach((id,o) -> {
             if (filter.matches(o.getDescription()))
                 results.add(o.getDescription());
@@ -108,7 +116,14 @@ public class OperationsLoopback extends MLog implements MicroPusher, MicroDiscov
 
     @Override
     public void reload() {
-        
+        if (operations == null) return;
+        ArrayList<Operation> list = new ArrayList<>();
+        api.list(list);
+        list.forEach(o -> {
+            OperationDescription desc2 = new OperationDescription(o.getDescription());
+            desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.LOCAL_TRANSPORT);
+            MicroUtil.firePushAdd(desc2);
+        });
     }
 
 }

@@ -10,6 +10,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MStopWatch;
 import de.mhus.lib.core.MValidator;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.config.MConfig;
@@ -82,12 +83,18 @@ public class CmdOperationExecute extends AbstractCmd {
             filter = new PathFilter(path, version, eLabels);
         }
         
+        MStopWatch timer = new MStopWatch(path).start();
         List<MicroResult> res = api.execute(filter, eArguments, eProperties);
-        
+        timer.stop();
+        if (res.size() == 0)
+            System.out.println("Operation not found");
+        else
+            System.out.println(res.size() + " operations executed in " + timer.getCurrentTimeAsString() );
         for (MicroResult r : res) {
             System.out.println(r.getDescription());
             System.out.println(r.getResult());
         }
+        
         
         return null;
     }

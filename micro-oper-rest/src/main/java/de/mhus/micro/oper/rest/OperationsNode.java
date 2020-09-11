@@ -20,7 +20,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MJson;
+import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.MValidator;
+import de.mhus.lib.core.cfg.CfgInt;
 import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.config.JsonConfigBuilder;
@@ -29,6 +31,7 @@ import de.mhus.lib.core.operation.Operation;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.lib.core.operation.TaskContext;
+import de.mhus.lib.core.parser.StringCompiler;
 import de.mhus.lib.errors.NotSupportedException;
 import de.mhus.micro.api.MicroConst;
 import de.mhus.micro.api.MicroUtil;
@@ -52,7 +55,9 @@ import de.mhus.rest.osgi.PublicRestNode;
         service = {RestNodeService.class, EventHandler.class, MicroProvider.class})
 public class OperationsNode extends AbstractNode implements EventHandler, MicroProvider {
 
-    private CfgString CFG_URL = new CfgString(OperationsNode.class, "url", "http://localhost:8181/rest/public/operation");
+    private CfgString CFG_HOST = new CfgString(OperationsNode.class, "host", MSystem.getHostname());
+    private CfgInt CFG_PORT = new CfgInt(OperationsNode.class, "port", 8181);
+    private CfgString CFG_URL = new CfgString(OperationsNode.class, "url", "http://${host}:${port}/rest/public/operation");
     private Map<UUID,OperationDescription> descriptions = Collections.synchronizedMap(new HashMap<>());
     
     @Reference
@@ -69,10 +74,25 @@ public class OperationsNode extends AbstractNode implements EventHandler, MicroP
             OperationDescription desc = item.getDescription();
             OperationDescription desc2 = new OperationDescription(desc);
             desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
-            desc2.putLabel(MicroConst.REST_URL, CFG_URL.value() + "/" + desc.getPath() + "/" + desc.getVersionString());
+            String urlPrefix = prepareUrlPrefix();
+            desc2.putLabel(MicroConst.REST_URL, urlPrefix + "/" + desc.getPath() + "/" + desc.getVersionString());
             desc2.putLabel(MicroConst.REST_METHOD, "POST");
             descriptions.put(desc2.getUuid(), desc2);
             MicroUtil.firePushAdd(desc2);
+        }
+    }
+
+    private String prepareUrlPrefix() {
+        try {
+            String url = CFG_URL.value();
+
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put("host", CFG_HOST.value());
+            attributes.put("port", CFG_PORT.value());
+            return StringCompiler.compile(url).execute(attributes);
+        } catch (Throwable t) {
+            log().e(t);
+            return CFG_URL.value();
         }
     }
 

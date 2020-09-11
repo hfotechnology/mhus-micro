@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.http.client.HttpClient;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -25,13 +26,14 @@ import de.mhus.micro.api.client.MicroDiscoverer;
 import de.mhus.micro.api.client.MicroExecutor;
 import de.mhus.micro.api.client.MicroFilter;
 import de.mhus.micro.api.client.MicroOperation;
+import de.mhus.osgi.api.MOsgi;
 
 @Component(immediate = true, property = {
         MicroDiscoverer.EVENT_TOPICS
         },
         service = {MicroExecutor.class, EventHandler.class}
         )
-public class MicroClientRest extends MLog implements MicroExecutor, EventHandler {
+public class MicroRestExecutor extends MLog implements MicroExecutor, EventHandler {
 
     private HttpClient client = new MHttpClientBuilder().getHttpClient();
     private Map<UUID,RestOperation> operations = Collections.synchronizedMap(new HashMap<>());
@@ -40,17 +42,14 @@ public class MicroClientRest extends MLog implements MicroExecutor, EventHandler
     private MicroApi api;
     
     @Activate
-    public void doActivate() {
-        api = M.l(MicroApi.class);
-        ArrayList<OperationDescription> list = new ArrayList<>();
-        api.discover(new FilterTransport(MicroConst.REST_TRANSPORT), list);
-        for (OperationDescription desc : list) {
-            RestOperation oper = new RestOperation(desc, client);
-            operations.put(desc.getUuid(), oper);
-            MicroUtil.fireOperationAdd(oper);
-        }
+    public void doActivate(ComponentContext ctx) {
+        MOsgi.runAfterActivation(ctx, c -> doStart());
     }
     
+    private void doStart() {
+        reload();
+    }
+
     @Override
     public void find(MicroFilter filter, List<MicroOperation> results) {
         operations.forEach((i,o) -> {
@@ -80,6 +79,18 @@ public class MicroClientRest extends MLog implements MicroExecutor, EventHandler
             RestOperation oper = operations.remove(desc.getUuid());
             if (oper != null)
                 MicroUtil.fireOperationRemove(oper);
+        }
+    }
+
+    @Override
+    public void reload() {
+        api = M.l(MicroApi.class);
+        ArrayList<OperationDescription> list = new ArrayList<>();
+        api.discover(new FilterTransport(MicroConst.REST_TRANSPORT), list);
+        for (OperationDescription desc : list) {
+            RestOperation oper = new RestOperation(desc, client);
+            operations.put(desc.getUuid(), oper);
+            MicroUtil.fireOperationAdd(oper);
         }
     }
 

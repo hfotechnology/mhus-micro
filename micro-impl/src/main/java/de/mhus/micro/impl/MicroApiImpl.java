@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -42,8 +42,13 @@ public class MicroApiImpl extends MLog implements MicroApi {
     private EventAdmin eventAdmin;
     
     @Activate
-    public void doActivate(BundleContext ctx) {
-        executorTracker = new MServiceTracker<MicroExecutor>(ctx, MicroExecutor.class) {
+    public void doActivate(ComponentContext ctx) {
+        MOsgi.runAfterActivation(ctx, c -> doStart(c)); 
+        
+    }
+    
+    private void doStart(ComponentContext ctx) {
+        executorTracker = new MServiceTracker<MicroExecutor>(ctx.getBundleContext(), MicroExecutor.class) {
 
             @Override
             protected void removeService(ServiceReference<MicroExecutor> reference, MicroExecutor service) {
@@ -57,7 +62,7 @@ public class MicroApiImpl extends MLog implements MicroApi {
         };
         executorTracker.start();
         
-        discoverTracker = new MServiceTracker<MicroDiscoverer>(ctx, MicroDiscoverer.class) {
+        discoverTracker = new MServiceTracker<MicroDiscoverer>(ctx.getBundleContext(), MicroDiscoverer.class) {
 
             @Override
             protected void removeService(ServiceReference<MicroDiscoverer> reference, MicroDiscoverer service) {
@@ -70,9 +75,8 @@ public class MicroApiImpl extends MLog implements MicroApi {
             }
         };
         discoverTracker.start();
-        
     }
-    
+
     @Deactivate
     public void doDeactivate() {
         if (executorTracker != null)
@@ -96,11 +100,9 @@ public class MicroApiImpl extends MLog implements MicroApi {
 
         for (MicroOperation oper : list) {
             IConfig res = oper.execute(arguments, properties);
-            if (res != null) {
-                out.add(new MicroResult(oper.getDescription(), res));
-                if (!broadcast)
-                    return out;
-            }
+            out.add(new MicroResult(oper.getDescription(), res));
+            if (!broadcast)
+                return out;
         }
         return out;
     }
@@ -123,6 +125,11 @@ public class MicroApiImpl extends MLog implements MicroApi {
     @Override
     public List<MicroProvider> getProviders() {
         return MOsgi.getServices(MicroProvider.class, null);
+    }
+
+    @Override
+    public List<MicroExecutor> getExecutors() {
+        return MOsgi.getServices(MicroExecutor.class, null);
     }
 
 }

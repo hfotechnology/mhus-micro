@@ -13,4 +13,5 @@ public interface MicroExecutor {
 
     void find(MicroFilter filter, List<MicroOperation> results);
 
+    void reload();
 }

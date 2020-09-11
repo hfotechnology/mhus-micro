@@ -7,9 +7,9 @@ import de.mhus.lib.core.operation.DefaultTaskContext;
 public class LocalTaskContext extends DefaultTaskContext {
 
     public LocalTaskContext(IConfig arguments) {
-        super(OperationsLoopback.class);
+        super(LocalOperationsLoopback.class);
         setParameters(arguments);
-        setConfig(MApi.getCfg(OperationsLoopback.class));
+        setConfig(MApi.getCfg(LocalOperationsLoopback.class));
         setTestOnly(false); //TODO
     }
 
