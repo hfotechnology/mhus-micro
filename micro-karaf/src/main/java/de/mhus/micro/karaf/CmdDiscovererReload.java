@@ -7,7 +7,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import de.mhus.lib.core.M;
 import de.mhus.micro.api.MicroApi;
 import de.mhus.micro.api.client.MicroDiscoverer;
-import de.mhus.micro.api.client.MicroExecutor;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 
 @Command(scope = "micro", name = "discoverer-reload", description = "Reload discoverer data")
