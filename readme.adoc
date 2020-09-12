@@ -86,3 +86,82 @@ sb-create de.mhus.micro.impl.FsDiscoverer
 ----
 
 
+Test Redis
+
+----
+
+Start redis and UI:
+
+docker run --name karaf-redis -d redis:6.0.8-alpine
+
+docker run -ti -d -p 5001:5001 --name karaf-redisui --link karaf-redis:redis marian/rebrow
+
+Access via: http://localhost:5001/redis:6379/0/
+
+
+Start karaf1:
+
+docker run -it \
+ -v ~/.m2:/home/user/.m2\
+ -p 15006:5005\
+ -p 18182:8181\
+ -h karaf1\
+ --name karaf1\
+ --link karaf-redis:redis\
+ mhus/apache-karaf:4.2.6_04 debug
+
+
+Install:
+
+feature:repo-add mvn:org.apache.shiro/shiro-features/1.5.1/xml/features
+feature:repo-add mvn:de.mhus.osgi/mhus-features/7.2.0-SNAPSHOT/xml/features
+
+feature:install eventadmin
+
+feature:install mhu-micro
+
+install -s mvn:de.mhus.osgi/dev-micro/7.2.0-SNAPSHOT
+
+feature:install mhu-rest
+install -s mvn:de.mhus.micro/micro-oper-rest/7.0.0-SNAPSHOT
+
+sb-create de.mhus.rest.osgi.RestServlet
+
+install -s mvn:de.mhus.micro/micro-execute-rest/7.0.0-SNAPSHOT
+
+install -s mvn:de.mhus.micro/micro-discover-redis/7.0.0-SNAPSHOT
+
+
+
+
+Start karaf2:
+
+docker run -it \
+ -v ~/.m2:/home/user/.m2\
+ -p 15007:5005\
+ -p 18183:8181\
+ -h karaf2\
+ --name karaf2\
+ --link karaf1:karaf1\
+ --link karaf-redis:redis\
+ mhus/apache-karaf:4.2.6_04 debug
+
+
+Install:
+
+feature:repo-add mvn:org.apache.shiro/shiro-features/1.5.1/xml/features
+feature:repo-add mvn:de.mhus.osgi/mhus-features/7.2.0-SNAPSHOT/xml/features
+
+feature:install eventadmin
+
+feature:install mhu-micro
+
+install -s mvn:de.mhus.micro/micro-execute-rest/7.0.0-SNAPSHOT
+
+install -s mvn:de.mhus.micro/micro-discover-redis/7.0.0-SNAPSHOT
+
+
+----
+
+
+

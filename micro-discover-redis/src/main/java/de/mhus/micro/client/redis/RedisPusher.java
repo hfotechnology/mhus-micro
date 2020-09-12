@@ -9,6 +9,7 @@ import java.util.Map;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -26,7 +27,6 @@ import de.mhus.micro.api.operation.OperationsAdmin;
 import de.mhus.micro.api.server.MicroProvider;
 import de.mhus.micro.api.server.MicroPusher;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 @Component(immediate = true,
         service = {MicroPusher.class, EventHandler.class},
@@ -37,13 +37,15 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
     private static CfgString CFG_PREFIX = new CfgString(RedisPusher.class, "prefix", MSystem.getHostname());
 
     private Map<String, OperationDescription> operations = Collections.synchronizedMap(new HashMap<>());
+
+    @Reference
     private MicroApi api;
 
-    private JedisPool pool;
+    @Reference
+    private RedisAdmin redis;
 
     @Activate
     public void doActivate() {
-        pool = new JedisPool(RedisDiscoverer.CFG_REDIS_HOST.value(), RedisDiscoverer.CFG_REDIS_PORT.value());
         reload();
     }
 
@@ -51,7 +53,6 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
     public void doDeactivate() {
         operations.forEach((k,d) -> remove(d) );
         operations = null;
-        pool.destroy();
     }
 
     @Override
@@ -96,17 +97,17 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
     }
 
     private void remove(OperationDescription desc) {
-        try (Jedis jedis = pool.getResource()) {
-            jedis.hdel(RedisDiscoverer.CFG_REDIS_NODE.value(), ident(desc));
+        try (Jedis jedis = redis.getResource()) {
+            jedis.hdel(redis.getNodeName(), ident(desc));
         } catch (Throwable t) {
             log().e(t);
         }
     }
 
     private void add(OperationDescription desc) {
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = redis.getResource()) {
             String content = toContent(desc);
-            jedis.hset(RedisDiscoverer.CFG_REDIS_NODE.value(),ident(desc).toString(), content);
+            jedis.hset(redis.getNodeName(),ident(desc).toString(), content);
         } catch (Throwable t) {
             log().e(t);
         }

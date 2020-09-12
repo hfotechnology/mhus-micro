@@ -1,0 +1,8 @@
+
+
+https://www.baeldung.com/jedis-java-redis-client-library
+
+
+Redis UI:
+
+https://github.com/marians/rebrow
