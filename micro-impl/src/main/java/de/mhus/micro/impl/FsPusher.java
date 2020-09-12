@@ -86,7 +86,7 @@ public class FsPusher extends MLog implements MicroPusher, EventHandler {
         if (transport == null) return;
         
         String topic = event.getTopic();
-        log().d("event", topic, desc);
+        log().i("event",event);
 
         if (MicroPusher.EVENT_TOPIC_ADD.equals(topic)) {
                 operations.put(ident(desc), desc);

@@ -51,13 +51,18 @@ public class FsDiscoverer extends MLog implements MicroDiscoverer {
     
     private void refresh() {
         if (descriptions == null) return;
-        try {
             
             if (!CFG_REFRESH_PERIOD.isTimeOut(lastRefresh))
                 return;
             lastRefresh = System.currentTimeMillis();
+            reload();
+    }
+    
+    @Override
+    public void reload() {
+        try {
             
-            log().t("refresh");
+            log().t("reload");
             if (!CFG_DIR.value().exists())
                 return;
             for (File file : CFG_DIR.value().listFiles()) {

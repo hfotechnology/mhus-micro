@@ -64,11 +64,11 @@ public class MicroRestExecutor extends MLog implements MicroExecutor, EventHandl
         OperationDescription desc = (OperationDescription)event.getProperty(MicroDiscoverer.EVENT_PROPERTY_DESCRIPTION);
         if (desc == null) return;
         HashMap<String, String> descParam = desc.getLabels();
-        if (descParam == null) return;
         String transType = descParam.get(MicroConst.DESC_LABEL_TRANSPORT_TYPE);
+        log().i("event",event); //XXX
         if (!MicroConst.REST_TRANSPORT.equals(transType)) return;
-        String uri = descParam.get(MicroConst.REST_URL);
-        if (uri == null) return;
+//        String url = descParam.get(MicroConst.REST_URL);
+//        if (url == null) return;
         
         if (event.getTopic().equals(MicroDiscoverer.EVENT_TOPIC_ADD)) {
             RestOperation oper = new RestOperation(desc, client);

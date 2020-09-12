@@ -214,6 +214,7 @@ public class OperationsNode extends AbstractNode implements EventHandler, MicroP
         if (desc == null) return;
         
         String topic = event.getTopic();
+        log().i("event",event); //XXX
         if (OperationsAdmin.EVENT_TOPIC_ADD.equals(topic)) {
             OperationDescription desc2 = new OperationDescription(desc);
             desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);

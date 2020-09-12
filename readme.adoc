@@ -164,4 +164,14 @@ install -s mvn:de.mhus.micro/micro-discover-redis/7.0.0-SNAPSHOT
 ----
 
 
+Test on / off operations
+
+----
+
+sb-create de.mhus.osgi.dev.micro.AnotherOperation
+
+
+sb-delete de.mhus.osgi.dev.micro.AnotherOperation 
+
+----
 

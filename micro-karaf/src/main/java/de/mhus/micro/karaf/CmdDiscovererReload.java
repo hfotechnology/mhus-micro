@@ -6,12 +6,13 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 import de.mhus.lib.core.M;
 import de.mhus.micro.api.MicroApi;
-import de.mhus.micro.api.server.MicroPusher;
+import de.mhus.micro.api.client.MicroDiscoverer;
+import de.mhus.micro.api.client.MicroExecutor;
 import de.mhus.osgi.api.karaf.AbstractCmd;
 
-@Command(scope = "micro", name = "pusher-reload", description = "Reload pusher data")
+@Command(scope = "micro", name = "discoverer-reload", description = "Reload discoverer data")
 @Service
-public class CmdPusherReload extends AbstractCmd {
+public class CmdDiscovererReload extends AbstractCmd {
 
     @Argument(
             index = 0,
@@ -24,10 +25,10 @@ public class CmdPusherReload extends AbstractCmd {
     @Override
     public Object execute2() throws Exception {
         MicroApi api = M.l(MicroApi.class);
-        for (MicroPusher pusher : api.getPushers()) {
-            if (name == null || pusher.getClass().getCanonicalName().equals(name)) {
-                System.out.println("Reload " + pusher.getClass().getCanonicalName());
-                pusher.reload();
+        for (MicroDiscoverer item : api.getDiscoverer()) {
+            if (name == null || item.getClass().getCanonicalName().equals(name)) {
+                System.out.println("Reload " + item.getClass().getCanonicalName());
+                item.reload();
             }
         }
         return null;

@@ -66,7 +66,7 @@ public class LocalOperationsLoopback extends MLog implements MicroPusher, MicroD
         if (desc == null) return;
         
         String topic = event.getTopic();
-        log().d("event", topic, desc);
+        log().i("event",event); //XXX
         if (OperationsAdmin.EVENT_TOPIC_ADD.equals(topic)) {
             OperationDescription desc2 = new OperationDescription(desc);
             desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.LOCAL_TRANSPORT);

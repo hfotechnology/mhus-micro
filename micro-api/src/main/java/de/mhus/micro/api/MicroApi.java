@@ -5,6 +5,7 @@ import java.util.List;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.OperationDescription;
+import de.mhus.micro.api.client.MicroDiscoverer;
 import de.mhus.micro.api.client.MicroExecutor;
 import de.mhus.micro.api.client.MicroFilter;
 import de.mhus.micro.api.client.MicroOperation;
@@ -51,5 +52,7 @@ public interface MicroApi {
     List<MicroProvider> getProviders();
 
     List<MicroExecutor> getExecutors();
+
+    List<MicroDiscoverer> getDiscoverer();
 
 }

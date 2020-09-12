@@ -132,4 +132,9 @@ public class MicroApiImpl extends MLog implements MicroApi {
         return MOsgi.getServices(MicroExecutor.class, null);
     }
 
+    @Override
+    public List<MicroDiscoverer> getDiscoverer() {
+        return MOsgi.getServices(MicroDiscoverer.class, null);
+    }
+
 }

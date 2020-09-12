@@ -26,7 +26,6 @@ import de.mhus.micro.api.MicroConst;
 import de.mhus.micro.api.operation.OperationsAdmin;
 import de.mhus.micro.api.server.MicroProvider;
 import de.mhus.micro.api.server.MicroPusher;
-import redis.clients.jedis.Jedis;
 
 @Component(immediate = true,
         service = {MicroPusher.class, EventHandler.class},
@@ -59,6 +58,7 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
     public void reload() {
         if (operations == null) return;
         api = M.l(MicroApi.class);
+        if (api == null) return;
         
         List<OperationDescription> list = new LinkedList<>();
         for ( MicroProvider provider : api.getProviders()) {
@@ -69,7 +69,7 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
             add(desc);
         });
         String prefix = CFG_PREFIX.value() + "_";
-        try (Jedis jedis = redis.getResource()) {
+        try (JedisCon jedis = redis.getResource()) {
             for (String name : jedis.hkeys(redis.getNodeName())) {
                 if (name.startsWith(prefix) && !operations.containsKey(name)) {
                     log().i("Remove from Redis",name);
@@ -93,7 +93,7 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
         if (transport == null) return;
         
         String topic = event.getTopic();
-        log().d("event", topic, desc);
+        log().i("event",event); //XXX
 
         if (MicroPusher.EVENT_TOPIC_ADD.equals(topic)) {
                 operations.put(ident(desc), desc);
@@ -107,7 +107,7 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
     }
 
     private void remove(OperationDescription desc) {
-        try (Jedis jedis = redis.getResource()) {
+        try (JedisCon jedis = redis.getResource()) {
             jedis.hdel(redis.getNodeName(), ident(desc));
         } catch (Throwable t) {
             log().e(t);
@@ -115,7 +115,7 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
     }
 
     private void add(OperationDescription desc) {
-        try (Jedis jedis = redis.getResource()) {
+        try (JedisCon jedis = redis.getResource()) {
             String content = toContent(desc);
             jedis.hset(redis.getNodeName(),ident(desc).toString(), content);
         } catch (Throwable t) {

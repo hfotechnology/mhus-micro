@@ -21,4 +21,6 @@ public interface MicroDiscoverer {
 
     void discover(MicroFilter filter, List<OperationDescription> results);
 
+    void reload();
+
 }
