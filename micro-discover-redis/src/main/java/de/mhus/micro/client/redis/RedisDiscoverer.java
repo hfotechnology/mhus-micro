@@ -97,7 +97,7 @@ public class RedisDiscoverer extends MLog implements MicroDiscoverer {
         OperationDescription desc = OperationDescription.fromJson(json);
         
         // add to registry
-        descriptions.put(RedisPusher.ident(desc), desc);
+        descriptions.put(name, desc);
         
         // fire event
         MicroUtil.fireOperationDescriptionAdd(desc);

@@ -68,6 +68,16 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
             operations.put(ident(desc), desc);
             add(desc);
         });
+        String prefix = CFG_PREFIX.value() + "_";
+        try (Jedis jedis = redis.getResource()) {
+            for (String name : jedis.hkeys(redis.getNodeName())) {
+                if (name.startsWith(prefix) && !operations.containsKey(name)) {
+                    log().i("Remove from Redis",name);
+                    jedis.hdel(redis.getNodeName(), name);
+                }
+                   
+            }
+        }
     }
     
     public static String ident(OperationDescription desc) {
