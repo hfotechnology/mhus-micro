@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.mhus.lib.core.MJson;
 import de.mhus.lib.core.MLog;
+import de.mhus.lib.core.MThread;
 import de.mhus.lib.core.cfg.CfgTimeInterval;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.service.TimerFactory;
@@ -25,11 +26,12 @@ import de.mhus.lib.core.service.TimerIfc;
 import de.mhus.micro.api.MicroUtil;
 import de.mhus.micro.api.client.MicroDiscoverer;
 import de.mhus.micro.api.client.MicroFilter;
+import redis.clients.jedis.JedisPubSub;
 
 @Component
 public class RedisDiscoverer extends MLog implements MicroDiscoverer {
 
-    private static CfgTimeInterval CFG_REFRESH_PERIOD = new CfgTimeInterval(RedisDiscoverer.class, "refreshPeriod", "5s");
+    private static CfgTimeInterval CFG_REFRESH_PERIOD = new CfgTimeInterval(RedisDiscoverer.class, "refreshPeriod", "120s");
     
     private volatile Map<String,OperationDescription> descriptions = Collections.synchronizedMap(new HashMap<>());
 
@@ -42,10 +44,69 @@ public class RedisDiscoverer extends MLog implements MicroDiscoverer {
     private TimerFactory timerFacory;
 
     private TimerIfc timer;
+
+    private JedisCon jedisSubscribe;
+
+    private JedisPubSub jedisPubSub;
     
     @Activate
     public void doActivate() {
         log().i("Start","RedisDiscoverer");
+        
+        jedisSubscribe = redis.getResource();
+        jedisPubSub = new JedisPubSub() {
+
+            @Override
+            public void onMessage(String channel, String message) {
+                try {
+                    int pos = message.indexOf(":");
+                    if (pos > 0) {
+                        String action = message.substring(0,pos);
+                        String key = message.substring(pos+1);
+                        if (action.equals("add")) {
+                            try (JedisCon jedis = redis.getResource()) {
+                                load(jedis, key);
+                            }
+                        } else
+                        if (action.equals("remove")) {
+                            try (JedisCon jedis = redis.getResource()) {
+                                remove(jedis, key);
+                            }
+                        }
+                    }
+                } catch (Throwable t) {
+                    log().e("onMessage",channel,message,t);
+                }
+            }
+
+            @Override
+            public void onPMessage(String pattern, String channel, String message) {
+                
+            }
+
+            @Override
+            public void onSubscribe(String channel, int subscribedChannels) {
+                
+            }
+
+            @Override
+            public void onUnsubscribe(String channel, int subscribedChannels) {
+                
+            }
+
+            @Override
+            public void onPUnsubscribe(String pattern, int subscribedChannels) {
+                
+            }
+
+            @Override
+            public void onPSubscribe(String pattern, int subscribedChannels) {
+                
+            }
+            
+        };
+        MThread.run(t -> jedisSubscribe.subscribe(jedisPubSub, redis.getNodeName()) );
+        
         timer = timerFacory.getTimer();
         timer.schedule(getClass().getCanonicalName(), new TimerTask() {
             
@@ -57,7 +118,9 @@ public class RedisDiscoverer extends MLog implements MicroDiscoverer {
                 }
                 refresh();
             }
-        }, CFG_REFRESH_PERIOD.interval(), CFG_REFRESH_PERIOD.interval());
+        }, 100, CFG_REFRESH_PERIOD.interval());
+        
+
     }
 
     @Deactivate
@@ -67,6 +130,8 @@ public class RedisDiscoverer extends MLog implements MicroDiscoverer {
         for (OperationDescription  val : descriptions.values())
             MicroUtil.fireOperationDescriptionRemove( val );
         timer.cancel();
+        jedisPubSub.unsubscribe();
+        jedisSubscribe.close();
         descriptions = null;
     }
     
@@ -95,14 +160,7 @@ public class RedisDiscoverer extends MLog implements MicroDiscoverer {
                 }
                 
               for (String key : new ArrayList<>(descriptions.keySet())) {
-                  OperationDescription val = descriptions.get(key);
-                  if (val != null) {
-                      if (!jedis.hexists(redis.getNodeName(), key)) {
-                          log().i("Removed", key);
-                          descriptions.remove(key);
-                          MicroUtil.fireOperationDescriptionRemove((OperationDescription) val);
-                      }
-                  }
+                  remove(jedis, key);
               }
             } catch (Throwable t) {
                 log().e(t);
@@ -110,6 +168,17 @@ public class RedisDiscoverer extends MLog implements MicroDiscoverer {
 
         } catch (Throwable t) {
             log().w(t);
+        }
+    }
+
+    private void remove(JedisCon jedis, String key) {
+        OperationDescription val = descriptions.get(key);
+        if (val != null) {
+            if (!jedis.hexists(redis.getNodeName(), key)) {
+                log().i("Removed", key);
+                descriptions.remove(key);
+                MicroUtil.fireOperationDescriptionRemove(val);
+            }
         }
     }
 

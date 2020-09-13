@@ -108,7 +108,9 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
 
     private void remove(OperationDescription desc) {
         try (JedisCon jedis = redis.getResource()) {
-            jedis.hdel(redis.getNodeName(), ident(desc));
+            String ident = ident(desc);
+            jedis.hdel(redis.getNodeName(), ident);
+            jedis.publish(redis.getNodeName(), "remove:" + ident);
         } catch (Throwable t) {
             log().e(t);
         }
@@ -117,7 +119,9 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
     private void add(OperationDescription desc) {
         try (JedisCon jedis = redis.getResource()) {
             String content = toContent(desc);
-            jedis.hset(redis.getNodeName(),ident(desc).toString(), content);
+            String ident = ident(desc);
+            jedis.hset(redis.getNodeName(),ident, content);
+            jedis.publish(redis.getNodeName(), "add:" + ident);
         } catch (Throwable t) {
             log().e(t);
         }
