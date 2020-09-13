@@ -23,6 +23,7 @@ import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.parser.StringCompiler;
 import de.mhus.micro.api.MicroConst;
 import de.mhus.micro.api.client.MicroOperation;
+import de.mhus.micro.api.client.MicroResult;
 
 public class RestOperation extends MLog  implements MicroOperation {
 
@@ -39,7 +40,7 @@ public class RestOperation extends MLog  implements MicroOperation {
     }
 
     @Override
-    public IConfig execute(IConfig arguments, IProperties properties) {
+    public MicroResult execute(IConfig arguments, IProperties properties) {
         HttpResponse res = null;
         try {
             if (uri.contains("{"))
@@ -93,19 +94,20 @@ public class RestOperation extends MLog  implements MicroOperation {
                     properties.put("result", resJson);
 
                 if (MHttp.getHeader(res, "Encapsulated", "").equals("result"))
-                    return resJson.getObjectOrNull("result");
-                return resJson;
+                    return new MicroResult(true, resJson.getInt("rc", 0), resJson.getString("msg", ""), getDescription(), resJson.getObjectOrNull("result"));
+                return new MicroResult(true, 0, "",getDescription(), resJson);
             }
             if (MHttp.CONTENT_TYPE_TEXT.equals(type.getValue())) {
                 InputStream is = entry.getContent();
                 IConfig resCfg = new MConfig();
                 String resText = MFile.readFile(is);
                 resCfg.setString(IConfig.NAMELESS_VALUE, resText);
-                return resCfg;
+                return new MicroResult(true, 0, "",getDescription(), resCfg);
             }
             
         } catch (Exception e) {
             log().e(e);
+            return new MicroResult(false, -1, e.getMessage(), getDescription(), null);
         } finally {
             MHttpClientBuilder.close(res); // no NPE
         }

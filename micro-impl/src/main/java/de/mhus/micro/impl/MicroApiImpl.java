@@ -99,8 +99,11 @@ public class MicroApiImpl extends MLog implements MicroApi {
         }
 
         for (MicroOperation oper : list) {
-            IConfig res = oper.execute(arguments, properties);
-            out.add(new MicroResult(oper.getDescription(), res));
+            MicroResult res = oper.execute(arguments, properties);
+            if (res != null)
+                out.add(res);
+            else
+                out.add(new MicroResult(false, -2, "null",oper.getDescription(), null)); // create result in every case
             if (!broadcast)
                 return out;
         }

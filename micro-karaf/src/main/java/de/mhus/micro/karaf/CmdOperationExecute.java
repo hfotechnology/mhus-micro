@@ -91,8 +91,12 @@ public class CmdOperationExecute extends AbstractCmd {
         else
             System.out.println(res.size() + " operations executed in " + timer.getCurrentTimeAsString() );
         for (MicroResult r : res) {
-            System.out.println(r.getDescription());
-            System.out.println(r.getResult());
+            System.out.println("Operation:  " + r.getDescription());
+            System.out.println("Transport:  " + r.isTransportSuccessful());
+            System.out.println("ReturnCode: " + r.getReturnCode());
+            System.out.println("Message:    " + r.getMessage());
+            System.out.println("Result:     " + r.getResult());
+            System.out.println();
         }
         
         

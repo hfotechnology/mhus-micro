@@ -6,7 +6,7 @@ import de.mhus.lib.core.operation.OperationDescription;
 
 public interface MicroOperation {
 
-    IConfig execute(IConfig arguments, IProperties properties) throws Exception;
+    MicroResult execute(IConfig arguments, IProperties properties) throws Exception;
 
     OperationDescription getDescription();
 

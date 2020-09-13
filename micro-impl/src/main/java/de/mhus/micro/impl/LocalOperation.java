@@ -11,6 +11,7 @@ import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.lib.core.operation.TaskContext;
 import de.mhus.lib.errors.MException;
 import de.mhus.micro.api.client.MicroOperation;
+import de.mhus.micro.api.client.MicroResult;
 
 public class LocalOperation implements MicroOperation {
 
@@ -28,7 +29,7 @@ public class LocalOperation implements MicroOperation {
     }
 
     @Override
-    public IConfig execute(IConfig arguments, IProperties properties) throws Exception {
+    public MicroResult execute(IConfig arguments, IProperties properties) throws Exception {
         TaskContext taskContext = new LocalTaskContext(arguments);
         
         if (!oper.hasAccess(taskContext))
@@ -43,13 +44,13 @@ public class LocalOperation implements MicroOperation {
         if (r != null) {
             // map result to rest result
             if (r instanceof IConfig) {
-                return (IConfig)r;
+                return new MicroResult(true, 0, "",getDescription(), (IConfig)r);
             }
             if (r instanceof Map) {
-                return IConfig.readFromMap((Map<?,?>)r);
+                return new MicroResult(true, 0, "",getDescription(), IConfig.readFromMap((Map<?,?>)r));
             }
             if (r instanceof Collection<?>) {
-                return IConfig.readFromCollection((Collection<?>)r);
+                return new MicroResult(true, 0, "",getDescription(), IConfig.readFromCollection((Collection<?>)r));
             }
             throw new MException("return type not supported");
         }
