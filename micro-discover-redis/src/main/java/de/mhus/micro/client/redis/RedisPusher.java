@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimerTask;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -20,7 +21,10 @@ import de.mhus.lib.core.MJson;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.cfg.CfgString;
+import de.mhus.lib.core.cfg.CfgTimeInterval;
 import de.mhus.lib.core.operation.OperationDescription;
+import de.mhus.lib.core.service.TimerFactory;
+import de.mhus.lib.core.service.TimerIfc;
 import de.mhus.micro.api.MicroApi;
 import de.mhus.micro.api.MicroConst;
 import de.mhus.micro.api.operation.OperationsAdmin;
@@ -34,6 +38,7 @@ import de.mhus.micro.api.server.MicroPusher;
 public class RedisPusher extends MLog implements MicroPusher, EventHandler {
 
     private static CfgString CFG_PREFIX = new CfgString(RedisPusher.class, "prefix", MSystem.getHostname());
+    private static CfgTimeInterval CFG_REFRESH_PERIOD = new CfgTimeInterval(RedisPusher.class, "refreshPeriod", "120s");
 
     private Map<String, OperationDescription> operations = Collections.synchronizedMap(new HashMap<>());
 
@@ -43,14 +48,34 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
     @Reference
     private RedisAdmin redis;
 
+    @Reference
+    private TimerFactory timerFacory;
+
+    private TimerIfc timer;
+
     @Activate
     public void doActivate() {
         reload();
+        
+        timer = timerFacory.getTimer();
+        timer.schedule(getClass().getCanonicalName(), new TimerTask() {
+            
+            @Override
+            public void run() {
+                if (operations == null) {
+                    cancel();
+                    return;
+                }
+                retimeout();
+            }
+        }, CFG_REFRESH_PERIOD.interval(), CFG_REFRESH_PERIOD.interval());
+
     }
 
     @Deactivate
     public void doDeactivate() {
         operations.forEach((k,d) -> remove(d) );
+        timer.cancel();
         operations = null;
     }
 
@@ -66,7 +91,7 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
         }
         list.forEach(desc -> {
             operations.put(ident(desc), desc);
-            add(desc);
+            add(desc, true);
         });
         String prefix = CFG_PREFIX.value() + "_";
         try (JedisCon jedis = redis.getResource()) {
@@ -77,6 +102,14 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
                 }
                    
             }
+        }
+    }
+    
+    public void retimeout() {
+        if (operations == null) return;
+
+        for (OperationDescription desc : operations.values()) {
+            add(desc, false);
         }
     }
     
@@ -97,7 +130,7 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
 
         if (MicroPusher.EVENT_TOPIC_ADD.equals(topic)) {
                 operations.put(ident(desc), desc);
-                add(desc);
+                add(desc, true);
         } else
         if (MicroPusher.EVENT_TOPIC_REMOVE.equals(topic)) {
                 operations.remove(ident(desc));
@@ -116,12 +149,13 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
         }
     }
 
-    private void add(OperationDescription desc) {
+    private void add(OperationDescription desc, boolean push) {
         try (JedisCon jedis = redis.getResource()) {
             String content = toContent(desc);
             String ident = ident(desc);
             jedis.hset(redis.getNodeName(),ident, content);
-            jedis.publish(redis.getNodeName(), "add:" + ident);
+            if (push)
+                jedis.publish(redis.getNodeName(), "add:" + ident);
         } catch (Throwable t) {
             log().e(t);
         }
@@ -129,6 +163,7 @@ public class RedisPusher extends MLog implements MicroPusher, EventHandler {
     
     private String toContent(OperationDescription desc) throws Exception {
         ObjectNode json = desc.toJson();
+        json.put("timeout", System.currentTimeMillis() + CFG_REFRESH_PERIOD.interval());
         return MJson.toPrettyString(json);
     }
     

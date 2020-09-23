@@ -1,0 +1,12 @@
+karaf1_32b87deb-ce20-40d5-9a11-b1683a18707c_rest.json
+{
+  "path" : "de.mhus.osgi.dev.critical.micro.Hello",
+  "uuid" : "32b87deb-ce20-40d5-9a11-b1683a18707c",
+  "title" : "Hello",
+  "version" : "2.0.0",
+  "labels" : {
+    "rest.method" : "POST",
+    "rest.url" : "http://karaf1:8181/rest/public/operation/de.mhus.osgi.dev.critical.micro.Hello/2.0.0",
+    "trans" : "rest"
+  }
+}

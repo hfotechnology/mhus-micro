@@ -65,7 +65,7 @@ public class RedisDiscoverer extends MLog implements MicroDiscoverer {
                         String key = message.substring(pos+1);
                         if (action.equals("add")) {
                             try (JedisCon jedis = redis.getResource()) {
-                                load(jedis, key);
+                                load(jedis, key, true);
                             }
                         } else
                         if (action.equals("remove")) {
@@ -154,8 +154,9 @@ public class RedisDiscoverer extends MLog implements MicroDiscoverer {
                     OperationDescription entry = descriptions.get(name);
                     if (entry != null) {
                         // TODO check changed
+                        load(jedis, name, false);
                     } else {
-                        load(jedis, name);
+                        load(jedis, name, true);
                     }
                 }
                 
@@ -182,17 +183,28 @@ public class RedisDiscoverer extends MLog implements MicroDiscoverer {
         }
     }
 
-    private void load(JedisCon jedis, String name) throws JsonProcessingException, IOException {
-        log().i("Add",name);
+    private void load(JedisCon jedis, String name, boolean push) throws JsonProcessingException, IOException {
+        if (push)
+            log().i("Add",name);
+        else
+            log().i("Update",name);
         String value = jedis.hget(redis.getNodeName(), name);
         JsonNode json = MJson.load(value);
+        long timeout = json.get("timeout").longValue();
         OperationDescription desc = OperationDescription.fromJson(json);
+        if (timeout < System.currentTimeMillis()) {
+            log().i("Add timeout",name);
+            descriptions.remove(name);
+            MicroUtil.fireOperationDescriptionRemove(desc);
+            return;
+        }
         
         // add to registry
         descriptions.put(name, desc);
         
         // fire event
-        MicroUtil.fireOperationDescriptionAdd(desc);
+        if (push)
+            MicroUtil.fireOperationDescriptionAdd(desc);
         
 
     }
