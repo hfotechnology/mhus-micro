@@ -72,11 +72,7 @@ public class OperationsNode extends AbstractNode implements EventHandler, MicroP
     public void reload() {
         for (Operation item : admin.list()) {
             OperationDescription desc = item.getDescription();
-            OperationDescription desc2 = new OperationDescription(desc);
-            desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
-            String urlPrefix = prepareUrlPrefix();
-            desc2.putLabel(MicroConst.REST_URL, urlPrefix + "/" + desc.getPath() + "/" + desc.getVersionString());
-            desc2.putLabel(MicroConst.REST_METHOD, "POST");
+            OperationDescription desc2 = prepareDesc(desc);
             descriptions.put(desc2.getUuid(), desc2);
             MicroUtil.firePushAdd(desc2);
         }
@@ -216,21 +212,27 @@ public class OperationsNode extends AbstractNode implements EventHandler, MicroP
         String topic = event.getTopic();
         log().i("event",event); //XXX
         if (OperationsAdmin.EVENT_TOPIC_ADD.equals(topic)) {
-            OperationDescription desc2 = new OperationDescription(desc);
-            desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
+            OperationDescription desc2 = prepareDesc(desc);
             descriptions.put(desc2.getUuid(), desc2);
             MicroUtil.firePushAdd(desc2);
         } else
         if (OperationsAdmin.EVENT_TOPIC_REMOVE.equals(topic)) {
             OperationDescription desc2 = descriptions.get(desc.getUuid());
-            if (desc2 == null) {
-                desc2 = new OperationDescription(desc);
-                desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
-            }
+            if (desc2 == null) 
+                desc2 = prepareDesc(desc2);
             MicroUtil.firePushRemove(desc2);
             descriptions.remove(desc2.getUuid());
         }
 
+    }
+
+    private OperationDescription prepareDesc(OperationDescription desc) {
+        OperationDescription desc2 = new OperationDescription(desc);
+        desc2.putLabel(MicroConst.DESC_LABEL_TRANSPORT_TYPE, MicroConst.REST_TRANSPORT);
+        String urlPrefix = prepareUrlPrefix();
+        desc2.putLabel(MicroConst.REST_URL, urlPrefix + "/" + desc.getPath() + "/" + desc.getVersionString());
+        desc2.putLabel(MicroConst.REST_METHOD, "POST");
+        return desc2;
     }
 
     @Override
