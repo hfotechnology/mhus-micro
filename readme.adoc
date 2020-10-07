@@ -175,3 +175,21 @@ sb-delete de.mhus.osgi.dev.micro.AnotherOperation
 
 ----
 
+
+Test JMS
+
+----
+
+feature:repo-add activemq 5.15.8
+feature:install mhu-jms
+
+install -s mvn:de.mhus.micro/micro-oper-jms/7.0.0-SNAPSHOT
+
+bundle:install -s mvn:de.mhus.lib.itest/examples-jms/7.0.0-SNAPSHOT
+
+dev-res -y cp examples-jms
+
+sb-create de.mhus.micro.oper.jms.DefaultOperationsChannel
+
+----
+

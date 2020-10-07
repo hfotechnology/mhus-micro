@@ -1,14 +1,14 @@
-package de.mhus.micro.client.rest;
+package de.mhus.micro.api.client;
 
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.micro.api.MicroConst;
 import de.mhus.micro.api.client.MicroFilter;
 
-public class FilterTransport implements MicroFilter {
+public class TransportFilter implements MicroFilter {
 
     private String transport;
 
-    public FilterTransport(String transport) {
+    public TransportFilter(String transport) {
         this.transport = transport;
     }
     
