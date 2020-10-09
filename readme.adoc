@@ -180,16 +180,22 @@ Test JMS
 
 ----
 
+1)
 feature:repo-add activemq 5.15.8
 feature:install mhu-jms
-
+2)
+bundle:install -s mvn:de.mhus.lib.itest/examples-jms/7.0.0-SNAPSHOT
+3)
+dev-res -y cp examples-jms
+4)
 install -s mvn:de.mhus.micro/micro-oper-jms/7.0.0-SNAPSHOT
 
-bundle:install -s mvn:de.mhus.lib.itest/examples-jms/7.0.0-SNAPSHOT
-
-dev-res -y cp examples-jms
-
+karaf1 only:
+5)
 sb-create de.mhus.micro.oper.jms.DefaultOperationsChannel
+
+karaf2 Test:
+operation-execute -l trans=jmsqueue de.mhus.osgi.dev.critical.micro.Hello 2.0.0
 
 ----
 

@@ -2,25 +2,25 @@ package de.mhus.micro.oper.jms;
 
 import java.util.List;
 
-import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
 import de.mhus.lib.annotations.service.ServiceActivate;
 import de.mhus.lib.annotations.service.ServiceComponent;
 import de.mhus.lib.annotations.service.ServiceDeactivate;
+import de.mhus.lib.annotations.service.ServiceReference;
+import de.mhus.lib.core.M;
+import de.mhus.lib.core.MSystem;
 import de.mhus.lib.core.operation.Operation;
 import de.mhus.lib.core.operation.OperationDescription;
-import de.mhus.lib.core.service.IdentUtil;
-import de.mhus.lib.errors.MException;
 import de.mhus.lib.jms.MJms;
 import de.mhus.micro.api.operation.OperationsAdmin;
 import de.mhus.micro.api.server.MicroProvider;
+import de.mhus.osgi.api.jms.JmsDataChannel;
 
-@ServiceComponent
+@ServiceComponent(service = {JmsDataChannel.class,EventHandler.class,MicroProvider.class})
 public class DefaultOperationsChannel extends AbstractOperationsChannel implements EventHandler, MicroProvider {
 
-    @Reference
     private OperationsAdmin admin;
 
     @ServiceActivate
@@ -33,14 +33,14 @@ public class DefaultOperationsChannel extends AbstractOperationsChannel implemen
         clear();
     }
     
+    @ServiceReference
+    public void setAdmin(OperationsAdmin admin) {
+        this.admin = admin;
+    }
+    
     @Override
     protected String getQueueName() {
-        try {
-            return MJms.getConfig().getString("queue");
-        } catch (MException e) {
-            log().e(e);
-        }
-        return IdentUtil.getFullIdent();
+        return MJms.getConfig().getStringOrCreate("queue", k -> MSystem.getHostname());
     }
 
     @Override
@@ -50,6 +50,7 @@ public class DefaultOperationsChannel extends AbstractOperationsChannel implemen
 
     @Override
     public void reload() {
+        admin = M.l(OperationsAdmin.class);
         for (Operation item : admin.list())
             add(item);
     }

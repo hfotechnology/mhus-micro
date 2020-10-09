@@ -283,11 +283,11 @@ public class AbstractOperationsChannel extends AbstractJmsDataChannel {
             }
             
             if (res == null) {
-                ret.setLongProperty("rc", OperationResult.INTERNAL_ERROR);
+                ret.setIntProperty("rc", OperationResult.INTERNAL_ERROR);
                 ret.setStringProperty("msg", "null");
                 ret.setBooleanProperty("successful", false);
             } else {
-                ret.setLongProperty("rc", res.getReturnCode());
+                ret.setIntProperty("rc", res.getReturnCode());
                 ret.setStringProperty("msg", res.getMsg());
                 ret.setBooleanProperty("successful", res.isSuccessful());
                 OperationDescription next = res.getNextOperation();

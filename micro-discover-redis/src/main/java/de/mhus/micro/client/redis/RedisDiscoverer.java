@@ -131,6 +131,7 @@ public class RedisDiscoverer extends MLog implements MicroDiscoverer {
             MicroUtil.fireOperationDescriptionRemove( val );
         timer.cancel();
         jedisPubSub.unsubscribe();
+        jedisSubscribe.getClient().resetPipelinedCount(); // hack, if not jedisSubscribe.close will block
         jedisSubscribe.close();
         descriptions = null;
     }
