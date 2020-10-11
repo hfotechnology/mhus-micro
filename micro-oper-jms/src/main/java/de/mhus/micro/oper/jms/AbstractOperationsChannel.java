@@ -13,6 +13,9 @@ import javax.jms.Message;
 import javax.jms.ObjectMessage;
 import javax.jms.TextMessage;
 
+import org.apache.shiro.authc.BearerToken;
+import org.apache.shiro.subject.Subject;
+
 import de.mhus.lib.annotations.strategy.OperationChannel;
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MString;
@@ -29,6 +32,7 @@ import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.pojo.PojoModel;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.core.pojo.PojoParser;
+import de.mhus.lib.core.shiro.AccessUtil;
 import de.mhus.lib.core.util.SerializedValue;
 import de.mhus.lib.errors.NotSupportedException;
 import de.mhus.lib.jms.JmsChannel;
@@ -205,9 +209,21 @@ public class AbstractOperationsChannel extends AbstractJmsDataChannel {
                             "title",des.getTitle()
                             );
                 }
-            } else
-                res = doExecute(path, version, properties);
-            
+            } else {
+                String jwt = msg.getStringProperty("jwt_token");
+                Subject subject = null;
+                if (jwt != null) {
+                    BearerToken token = new BearerToken(jwt);
+                    subject = AccessUtil.getSubject();
+                    subject.login(token);
+                }
+                try {
+                    res = doExecute(path, version, properties);
+                } finally {
+                    if (subject != null)
+                        subject.logout();
+                }
+            }
             if (!needResult) {
                 log().d("Operation without result",path,res);
                 return null;

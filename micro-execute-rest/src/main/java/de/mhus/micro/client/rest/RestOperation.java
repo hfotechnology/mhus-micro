@@ -9,6 +9,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.apache.shiro.subject.Subject;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MFile;
@@ -21,6 +22,7 @@ import de.mhus.lib.core.io.http.MHttp;
 import de.mhus.lib.core.io.http.MHttpClientBuilder;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.parser.StringCompiler;
+import de.mhus.lib.core.shiro.AccessUtil;
 import de.mhus.micro.api.MicroConst;
 import de.mhus.micro.api.client.MicroOperation;
 import de.mhus.micro.api.client.MicroResult;
@@ -43,12 +45,18 @@ public class RestOperation extends MLog  implements MicroOperation {
     public MicroResult execute(IConfig arguments, IProperties properties) {
         HttpResponse res = null;
         try {
+            Subject subject = AccessUtil.getSubject();
+            
             if (uri.contains("{"))
                 uri = StringCompiler.compile(uri).execute(arguments);
             // TODO different methods - GET POST PUT DELETE
             if (MHttp.METHOD_POST.equals(method)) {
                 HttpPost post = new HttpPost(uri);
-            
+                if (subject.isAuthenticated()) {
+                    String jwt = AccessUtil.createBearerToken(subject, null);
+                    if (jwt != null)
+                        post.addHeader("Authorization", "Bearer " + jwt);
+                }
                 // TODO different transport types - xml, form properties - pluggable?
                 String argJson = IConfig.toPrettyJsonString(arguments);
                 post.setEntity(new StringEntity(argJson, MString.CHARSET_UTF_8));
@@ -56,7 +64,11 @@ public class RestOperation extends MLog  implements MicroOperation {
             } else
             if (MHttp.METHOD_PUT.equals(method)) {
                 HttpPut post = new HttpPut(uri);
-            
+                if (subject.isAuthenticated()) {
+                    String jwt = AccessUtil.createBearerToken(subject, null);
+                    if (jwt != null)
+                        post.addHeader("Authorization", "Bearer " + jwt);
+                }
                 // TODO different transport types - xml, form properties - pluggable?
                 String argJson = IConfig.toPrettyJsonString(arguments);
                 post.setEntity(new StringEntity(argJson, MString.CHARSET_UTF_8));
