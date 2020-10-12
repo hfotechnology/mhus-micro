@@ -46,7 +46,7 @@ import de.mhus.rest.core.api.RestResult;
 import de.mhus.rest.core.node.AbstractNode;
 import de.mhus.rest.core.result.ErrorJsonResult;
 import de.mhus.rest.core.result.JsonResult;
-import de.mhus.rest.osgi.PublicRestNode;
+import de.mhus.rest.osgi.nodes.PublicRestNode;
 
 @RestNode(name = "operation", parentNode = PublicRestNode.class)
 @Component(immediate = true,property = {
