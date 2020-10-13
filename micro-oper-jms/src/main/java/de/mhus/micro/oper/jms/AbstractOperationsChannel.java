@@ -51,7 +51,7 @@ public class AbstractOperationsChannel extends AbstractJmsDataChannel {
     public static final String OPERATION_GET = "_get";
     public static final String PARAM_OPERATION_ID = "id";
     public static final String PARAM_TRACE = "trace";
-    public static final String TRANSPORT_JMS = "jmsqueue";
+    public static final String TRANSPORT_JMS = "jms";
 
     protected HashMap<String, Operation> operations = new HashMap<String, Operation>();
 

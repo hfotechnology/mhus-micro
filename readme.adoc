@@ -195,7 +195,7 @@ karaf1 only:
 sb-create de.mhus.micro.oper.jms.DefaultOperationsChannel
 
 karaf2 Test:
-operation-execute -l trans=jmsqueue de.mhus.osgi.dev.critical.micro.Hello 2.0.0
+operation-execute -l trans=jms de.mhus.osgi.dev.critical.micro.Hello 2.0.0
 
 ----
 
