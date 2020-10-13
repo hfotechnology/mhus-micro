@@ -30,7 +30,7 @@ Rest provider:
 feature:install mhu-rest
 install -s mvn:de.mhus.micro/micro-oper-rest/7.0.0-SNAPSHOT
 
-sb-create de.mhus.rest.osgi.RestServlet
+blue-create de.mhus.rest.osgi.RestServlet
 
 Test in browser:
 
@@ -42,9 +42,9 @@ http://localhost:18182/rest/public/operation/de.mhus.osgi.dev.critical.micro.Hel
 
 Discover via file system:
 
-sb-create de.mhus.micro.impl.FsPusher
+blue-create de.mhus.micro.impl.FsPusher
 
-sb-create de.mhus.micro.impl.FsDiscoverer
+blue-create de.mhus.micro.impl.FsDiscoverer
 
 
 
@@ -80,7 +80,7 @@ feature:install mhu-micro
 
 install -s mvn:de.mhus.micro/micro-execute-rest/7.0.0-SNAPSHOT
 
-sb-create de.mhus.micro.impl.FsDiscoverer
+blue-create de.mhus.micro.impl.FsDiscoverer
 
 
 ----
@@ -125,7 +125,7 @@ install -s mvn:de.mhus.osgi/dev-micro/7.2.0-SNAPSHOT
 feature:install mhu-rest
 install -s mvn:de.mhus.micro/micro-oper-rest/7.0.0-SNAPSHOT
 
-sb-create de.mhus.rest.osgi.RestServlet
+blue-create de.mhus.rest.osgi.RestServlet
 
 install -s mvn:de.mhus.micro/micro-execute-rest/7.0.0-SNAPSHOT
 
@@ -168,10 +168,10 @@ Test on / off operations
 
 ----
 
-sb-create de.mhus.osgi.dev.micro.AnotherOperation
+blue-create de.mhus.osgi.dev.micro.AnotherOperation
 
 
-sb-delete de.mhus.osgi.dev.micro.AnotherOperation 
+blue-delete de.mhus.osgi.dev.micro.AnotherOperation 
 
 ----
 
@@ -192,7 +192,7 @@ install -s mvn:de.mhus.micro/micro-oper-jms/7.0.0-SNAPSHOT
 
 karaf1 only:
 5)
-sb-create de.mhus.micro.oper.jms.DefaultOperationsChannel
+blue-create de.mhus.micro.oper.jms.DefaultOperationsChannel
 
 karaf2 Test:
 operation-execute -l trans=jms de.mhus.osgi.dev.critical.micro.Hello 2.0.0
