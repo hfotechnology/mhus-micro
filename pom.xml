@@ -32,10 +32,6 @@
 	<name>mhus-rest</name>
 	<description>Framework to work with micro services</description>
 	<url>http://www.mhus.de</url>
-    <properties>
-       <cherry-reactive.version>${project.version}</cherry-reactive.version>
-       <cherry-reactive-plugin.version>7.0.0</cherry-reactive-plugin.version>
-    </properties>
 
 	<licenses>
 		<license>
