@@ -33,6 +33,7 @@
 	<description>Framework to work with micro services</description>
 	<url>http://www.mhus.de</url>
 
+    <inceptionYear>2020</inceptionYear>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
