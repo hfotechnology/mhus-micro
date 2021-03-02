@@ -32,7 +32,7 @@ import de.mhus.lib.core.pojo.MPojo;
 import de.mhus.lib.core.pojo.PojoModel;
 import de.mhus.lib.core.pojo.PojoModelFactory;
 import de.mhus.lib.core.pojo.PojoParser;
-import de.mhus.lib.core.shiro.AccessUtil;
+import de.mhus.lib.core.aaa.Aaa;
 import de.mhus.lib.core.util.SerializedValue;
 import de.mhus.lib.errors.NotSupportedException;
 import de.mhus.lib.jms.JmsChannel;
@@ -214,7 +214,7 @@ public class AbstractOperationsChannel extends AbstractJmsDataChannel {
                 Subject subject = null;
                 if (jwt != null) {
                     BearerToken token = new BearerToken(jwt);
-                    subject = AccessUtil.getSubject();
+                    subject = Aaa.getSubject();
                     subject.login(token);
                 }
                 try {

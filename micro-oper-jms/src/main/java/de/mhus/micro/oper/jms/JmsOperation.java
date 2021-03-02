@@ -10,7 +10,7 @@ import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.OperationDescription;
-import de.mhus.lib.core.shiro.AccessUtil;
+import de.mhus.lib.core.aaa.Aaa;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.jms.ClientJms;
 import de.mhus.lib.jms.JmsConnection;
@@ -43,9 +43,9 @@ public class JmsOperation extends MLog  implements MicroOperation {
                 TextMessage msg = con.createTextMessage();
                 msg.setStringProperty(AbstractOperationsChannel.PARAM_OPERATION_PATH, desc.getPath());
                 msg.setStringProperty(AbstractOperationsChannel.PARAM_OPERATION_VERSION, desc.getVersionString());
-                Subject subject = AccessUtil.getSubject();
+                Subject subject = Aaa.getSubject();
                 if (subject.isAuthenticated()) {
-                    String jwt = AccessUtil.createBearerToken(subject, null);
+                    String jwt = Aaa.createBearerToken(subject, null);
                     if (jwt != null)
                         msg.setStringProperty("jwt_token", jwt);
                 }

@@ -22,7 +22,7 @@ import de.mhus.lib.core.io.http.MHttp;
 import de.mhus.lib.core.io.http.MHttpClientBuilder;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.parser.StringCompiler;
-import de.mhus.lib.core.shiro.AccessUtil;
+import de.mhus.lib.core.aaa.Aaa;
 import de.mhus.micro.api.MicroConst;
 import de.mhus.micro.api.client.MicroOperation;
 import de.mhus.micro.api.client.MicroResult;
@@ -45,7 +45,7 @@ public class RestOperation extends MLog  implements MicroOperation {
     public MicroResult execute(IConfig arguments, IProperties properties) {
         HttpResponse res = null;
         try {
-            Subject subject = AccessUtil.getSubject();
+            Subject subject = Aaa.getSubject();
             
             if (uri.contains("{"))
                 uri = StringCompiler.compile(uri).execute(arguments);
@@ -53,7 +53,7 @@ public class RestOperation extends MLog  implements MicroOperation {
             if (MHttp.METHOD_POST.equals(method)) {
                 HttpPost post = new HttpPost(uri);
                 if (subject.isAuthenticated()) {
-                    String jwt = AccessUtil.createBearerToken(subject, null);
+                    String jwt = Aaa.createBearerToken(subject, null);
                     if (jwt != null)
                         post.addHeader("Authorization", "Bearer " + jwt);
                 }
@@ -65,7 +65,7 @@ public class RestOperation extends MLog  implements MicroOperation {
             if (MHttp.METHOD_PUT.equals(method)) {
                 HttpPut post = new HttpPut(uri);
                 if (subject.isAuthenticated()) {
-                    String jwt = AccessUtil.createBearerToken(subject, null);
+                    String jwt = Aaa.createBearerToken(subject, null);
                     if (jwt != null)
                         post.addHeader("Authorization", "Bearer " + jwt);
                 }
