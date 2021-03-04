@@ -57,13 +57,7 @@
 	</developers>
 	
 	<modules>
-        <module>micro-api</module>
-        <module>micro-impl</module>
-        <module>micro-karaf</module>
-        <module>micro-execute-rest</module>
-        <module>micro-discover-redis</module>
-        <module>micro-oper-rest</module>
-        <module>micro-oper-jms</module>
+        <module>micro-core</module>
      </modules>
 
 </project>

@@ -7,7 +7,7 @@ Again a library to implement RPC. The library will creates a layer to connect se
 
 A provider provides services and the executor is able to execute services on provider side.
 
-On provider side the service is published by the publisher to a central system and discovered by the discoverer.
+On provider side the service is published by the publisher to a central system and discovered by the discovery.
 
 
 === Features
