@@ -57,17 +57,28 @@
 			<groupId>de.mhus.lib</groupId>
 			<artifactId>lib-core</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>de.mhus.lib</groupId>
+            <artifactId>lib-junit</artifactId>
+        </dependency>
 		
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>2.4.2</version>
+            <version>3.5.1</version>
         </dependency>  
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
             <version>2.0</version>
         </dependency>     
+		
+		<dependency>
+		    <groupId>com.github.microwww</groupId>
+		    <artifactId>redis-server</artifactId>
+		    <version>0.1.0-3.0</version>
+		    <scope>test</scope>
+		</dependency>
 		
 	</dependencies>
 </project>

@@ -1,6 +1,7 @@
 package de.mhus.micro.core.api;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.config.IConfig;
@@ -26,7 +27,7 @@ public interface MicroApi {
      * @param filter
      * @param results
      */
-    void operations(MicroFilter filter, List<MicroOperation> results);
+    void operations(MicroFilter filter, Consumer<MicroOperation> results);
 
     /**
      * Return all known operation descriptions that match the filter.
@@ -34,7 +35,7 @@ public interface MicroApi {
      * @param filter
      * @param results
      */
-    void discover(MicroFilter filter, List<OperationDescription> results);
+    void discover(MicroFilter filter, Consumer<OperationDescription> results);
 
 //    List<MicroPusher> getPushers();
 

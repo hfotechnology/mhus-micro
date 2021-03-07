@@ -5,14 +5,21 @@
 
 Again a library to implement RPC. The library will creates a layer to connect several RPC frameworks and technics.
 
-A provider provides services and the executor is able to execute services on provider side.
+To execute a RPC a client and server side is needed. The server
+side provides the procedure and the client calls the procedure.
 
-On provider side the service is published by the publisher to a central system and discovered by the discovery.
+The framework also contains ways to announce the existing
+procedures from servers to the client. In this way the
+client should not know about how to call a RPC. The transport layer
+behind calling can be changed without changing the client application.
 
+On server side the publisher will publish known procedures
+to a register (o.a.) and on client side the discovery will
+collect the information.
 
 === Features
 
-* Every node is client and server in the same time
+* Every node can be client and server in the same time
 * Providing services with 'mhus operations' is a default feature
 
 === Possibilities
