@@ -2,14 +2,14 @@
   title: Operation 1
   version: 1.0.0
   labels:
-    trans: rest
+    '@proto': rest
 - path: de.test.operation1
   title: Operation 1
   version: 1.0.1
   labels:
-    trans: rest
+    '@proto': rest
 - path: de.test.operation2
   title: Operation 2
   labels:
-    trans: local
+    '@proto': local
     

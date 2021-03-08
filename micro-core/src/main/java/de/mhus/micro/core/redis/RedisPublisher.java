@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.mhus.lib.core.MCast;
 import de.mhus.lib.core.MJson;
 import de.mhus.lib.core.definition.DefRoot;
 import de.mhus.lib.core.operation.OperationDescription;
@@ -29,14 +30,18 @@ public class RedisPublisher extends AbstractPublisher {
     @Override
     public void push(OperationDescription desc) {
         
+//    	if (source.equals(desc.getLabels().get(C.LABEL_DISCOVER_SOURCE)))
+//    		return;
+    	
     	Map<String,String> val = new HashMap<>();
     	
     	val.put(C.DATA_UUID, desc.getUuid().toString());
     	val.put(C.DATA_PATH, desc.getPath());
     	val.put(C.DATA_VERSION, desc.getVersionString());
     	val.put(C.DATA_TITLE, desc.getTitle());
-    	for (Entry<String, String> label :  desc.getLabels().entrySet())
-    	val.put(C.DATA_LABEL + label.getKey(), label.getValue());
+    	for (Entry<String, Object> label :  desc.getLabels().entrySet())
+    		if (!label.getKey().startsWith(C.LABEL_LOCAL_PREFIX))
+    			val.put(C.DATA_LABEL_DOT + label.getKey(), MCast.toString(label.getValue()));
     	DefRoot form = desc.getForm();
     	if (form != null) {
     		try {
@@ -47,10 +52,28 @@ public class RedisPublisher extends AbstractPublisher {
     		}
     	}
     	
-    	String key = desc.getPath() + "-" + desc.getUuid() + "-" + desc.getLabels().getOrDefault(C.LABEL_TRANSPORT_TYPE, "");
+    	String key = RedisDiscovery.PREFIX + C.getUniqueId(desc);
     	try (Jedis con = pool.getResource()) {
-    		con.hset(RedisDiscovery.PREFIX + key, val);
+    		con.hset(key, val);
     	}
     }
+
+	@Override
+	public void remove(OperationDescription desc) {
+		
+//    	if (source.equals(desc.getLabels().get(C.LABEL_DISCOVER_SOURCE)))
+//    		return;
+
+    	String key = RedisDiscovery.PREFIX + C.getUniqueId(desc);
+    	try (Jedis con = pool.getResource()) {
+    		con.del(key);
+    	}
+	}
+
+	@Override
+	public void refresh() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

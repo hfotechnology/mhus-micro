@@ -2,11 +2,14 @@ package de.mhus.micro.core.fs;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.config.IConfigFactory;
 import de.mhus.lib.core.definition.DefRoot;
@@ -14,20 +17,20 @@ import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.form.ModelUtil;
-import de.mhus.micro.core.api.MicroFilter;
-import de.mhus.micro.core.util.AbstractDiscovery;
+import de.mhus.micro.core.api.C;
+import de.mhus.micro.core.util.AbstractProvider;
 
-public class ConfigDiscovery extends AbstractDiscovery {
+public class ConfigProvider extends AbstractProvider {
 
 	private ArrayList<OperationDescription> list = new ArrayList<>();
 	private File file;
 	private long modifyDate;
 	
-	public ConfigDiscovery(IConfig config) {
+	public ConfigProvider(IConfig config) {
 		reload(config);
 	}
 	
-	public ConfigDiscovery(File file) throws MException {
+	public ConfigProvider(File file) throws MException {
 		this.file = file;
 		reload(file);
 	}
@@ -60,38 +63,52 @@ public class ConfigDiscovery extends AbstractDiscovery {
 
 	public synchronized void reload(IConfig config) {
 		ArrayList<OperationDescription> l = new ArrayList<>();
+		Set<UUID> uuids = new HashSet<>();
+		
 		for (IConfig entry : config.getArrayOrCreate(IConfig.NAMELESS_VALUE)) {
 			try {
-				UUID uuid = UUID.fromString( entry.getStringOrCreate("uuid", x -> UUID.randomUUID().toString()) );
-				String path = entry.getString("path");
-				String title = entry.getString("title", path);
-				Version version = new Version( entry.getStringOrCreate("version", x -> Version.V_0_0_0.toString()));
+				UUID uuid = UUID.fromString( entry.getStringOrCreate(C.DATA_UUID, x -> UUID.randomUUID().toString()) );
+				String path = entry.getString(C.DATA_PATH);
+				String title = entry.getString(C.DATA_TITLE, path);
+				Version version = new Version( entry.getStringOrCreate(C.DATA_VERSION, x -> Version.V_0_0_0.toString()));
 				
-				OperationDescription desc = new OperationDescription(uuid, path, version, null, title);
-				
-				String formStr = entry.getString("form", null);
+				DefRoot form = null;
+				String formStr = entry.getString(C.DATA_FORM, null);
 				if (formStr != null) {
-					DefRoot form = ModelUtil.fromJson(formStr);
-					desc.setForm(form);
-				}
-				for (Entry<String, Object> label : entry.getObject("labels").entrySet()) {
-					desc.getLabels().put(label.getKey(), String.valueOf( label.getValue() ));
+					form = ModelUtil.fromJson(formStr);
 				}
 				
+				MProperties labels = null;
+				for (Entry<String, Object> label : entry.getObject(C.DATA_LABELS).entrySet()) {
+					if (labels == null) labels = new MProperties();
+					labels.put(label.getKey(), String.valueOf( label.getValue() ));
+				}
+				
+				OperationDescription desc = new OperationDescription(uuid, path, version, null, title, labels, form);
+								
 				l.add(desc);
+				uuids.add(desc.getUuid());
 				
+				if (api != null)
+					api.updateDescription(desc);
 			} catch (Throwable t) {
 				log().e(entry,t);
 			}
 			
 		}
 		
+		if (api != null)
+			list.forEach(desc -> {
+				if (!uuids.contains(desc.getUuid()))
+					api.removeDescription(desc);
+			});
+		
 		list = l;
 		
 	}
 	
 	@Override
-	public void discover(MicroFilter filter, Consumer<OperationDescription> action) {
+	public void discover(Consumer<OperationDescription> action) {
 		list.forEach( v -> action.accept(v) );
 	}
 

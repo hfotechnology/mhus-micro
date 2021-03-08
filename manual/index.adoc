@@ -17,6 +17,47 @@ On server side the publisher will publish known procedures
 to a register (o.a.) and on client side the discovery will
 collect the information.
 
+=== Purpose
+
+This library focus on publish and discover mechanisms to announce the existing
+procedures to each interested party. Connected to discovery the calling of
+procedures in different transport technologies is also in focus.
+
+The framework is as open as possible to allow dynamic extension of the features.
+
+=== Definitions
+
+* procedure - Or sometimes called 'operation' is the remote function to call
+* publish(er) service - Is the service which is publishing the procedures locally, e.g. redis publisher implementation 
+* discovery service - Is the service which is discovering locally, e.g. a redis discovery implementation
+* discovery store - Is the way a discovery information is saved, e.g. the redis database server
+* provider - Provide local procedures to be published (or not of only a local)
+
+=== Facts
+
+* locally provided procedures should not be published but can be called locally - It's a special case.
+* A procedure can be published in more then one way e.g. locally or the same vm, via rest and via JMS. There must be an 
+order to use the 'best' way to call a procedure.
+
+=== Discovery Methods
+
+There are two common methods: pull and push
+
+The framework supports both methods for publishers and discovery.
+
+=== Labels
+
+* _source - Is set by the discovery service to avoid publishing of the procedure to the same service again. This would cause a loop.
+* _new - Is set by discover services to mark a procedure temporarily as new
+* _deprecated - Is set by discovery services to mark a procedure temporarily as deprecated
+* _* - Local labels
+* @proto - The transfer method
+* @* - Transfer options depending on the transfer protocol
+
+All labels starting with '_' (underscore) should be local and not be transfered to the discovery store.
+
+All labels starting with "@" should not be used for filtering operations.
+
 === Features
 
 * Every node can be client and server in the same time

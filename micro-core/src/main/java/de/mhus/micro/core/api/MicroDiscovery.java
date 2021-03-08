@@ -4,12 +4,27 @@ import java.util.function.Consumer;
 
 import de.mhus.lib.core.operation.OperationDescription;
 
+/**
+ * Provide external services for local usage.
+ * @author mikehummel
+ *
+ */
 public interface MicroDiscovery {
 
+	/**
+	 * This is called periodically by the api to update the current state.
+	 */
     void check();
 
+    /**
+     * This is called to refresh all data.
+     */
     void reload();
     
-	void discover(MicroFilter filter, Consumer<OperationDescription> action);
+    /**
+     * Call action for each known operation.
+     * @param action
+     */
+	void discover(Consumer<OperationDescription> action);
     
 }

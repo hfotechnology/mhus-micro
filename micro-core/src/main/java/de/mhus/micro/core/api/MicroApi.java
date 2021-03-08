@@ -1,5 +1,6 @@
 package de.mhus.micro.core.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -19,34 +20,48 @@ public interface MicroApi {
      * @return list of results
      * @throws Exception 
      */
-    List<MicroResult> execute(MicroFilter filter, IConfig arguments, IProperties properties) throws Exception;
+    default List<MicroResult> execute(MicroFilter filter, IConfig arguments, IProperties properties) throws Exception {
+    	List<MicroResult> out = new ArrayList<>();
+    	discover(filter, desc -> {
+    		try {
+    			out.add( execute(desc, arguments, properties) );
+    		} catch (Throwable t) {
+    			out.add(new MicroResult(desc, t));
+    		}
+    	} );
+    	return out;
+    }
     
     /**
-     * Return all operations that match the filter.
+     * Execute the operation and returns the result.
+     * 
+     * @param operation
+     * @param arguments
+     * @param properties
+     * @return
+     * @throws Exception
+     */
+    MicroResult execute(OperationDescription operation, IConfig arguments, IProperties properties) throws Exception;
+    
+    /**
+     * Return all known operation descriptions that matches the filter.
+     * 
+     * @param filter
+     * @param action
+     */
+    default void discover(MicroFilter filter, Consumer<OperationDescription> action) {
+    	discover(desc -> {
+    		if (filter.matches(desc))
+    			action.accept(desc);
+    	});
+    }
+    
+    /**
+     * Return all known operation descriptions.
      * 
      * @param filter
      * @param results
      */
-    void operations(MicroFilter filter, Consumer<MicroOperation> results);
-
-    /**
-     * Return all known operation descriptions that match the filter.
-     * 
-     * @param filter
-     * @param results
-     */
-    void discover(MicroFilter filter, Consumer<OperationDescription> results);
-
-//    List<MicroPusher> getPushers();
-
-    /**
-     * Return all known providers.
-     * @return Providers
-     */
-//    List<MicroProvider> getProviders();
-
-//    List<MicroExecutor> getExecutors();
-
-//    List<MicroDiscoverer> getDiscoverer();
+    void discover(Consumer<OperationDescription> action);
 
 }

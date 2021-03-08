@@ -2,29 +2,53 @@ package de.mhus.micro.core.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.OperationDescription;
+import de.mhus.micro.core.api.C;
 import de.mhus.micro.core.api.MicroApi;
 import de.mhus.micro.core.api.MicroDiscovery;
-import de.mhus.micro.core.api.MicroFilter;
-import de.mhus.micro.core.api.MicroOperation;
+import de.mhus.micro.core.api.MicroProtocol;
+import de.mhus.micro.core.api.MicroProvider;
 import de.mhus.micro.core.api.MicroPublisher;
 import de.mhus.micro.core.api.MicroResult;
 
-public abstract class AbstractApi extends MLog implements MicroApi {
+public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 
 	private List<MicroDiscovery> discovery = Collections.synchronizedList(new ArrayList<>());
 	private List<MicroPublisher> publishers = Collections.synchronizedList(new ArrayList<>());
-	
+	private List<MicroProvider> providers = Collections.synchronizedList(new ArrayList<>());
+	private Map<String, MicroProtocol> protocols = Collections.synchronizedMap(new HashMap<>());
 	
     public void updateDescription(OperationDescription desc) {
-        // TODO Auto-generated method stub
-        
+        publishers.forEach(p -> { try {
+        	p.push(desc);
+        } catch (Throwable t) {
+        	log().e(desc,p,t);
+        } });
+    }
+
+    public void removeDescription(OperationDescription desc) {
+        publishers.forEach(p -> { try {
+        	p.remove(desc);
+        } catch (Throwable t) {
+        	log().e(desc,p,t);
+        } });
+    }
+    
+    public void addProvider(MicroProvider obj) {
+    	if (obj instanceof AbstractProvider)
+    		((AbstractProvider)obj).doInit(this);
+    	discovery.add(obj);
+    	providers.add(obj);
+    	
+    	publishToAll(obj);
     }
     
     public void addDiscovery(MicroDiscovery obj) {
@@ -32,7 +56,6 @@ public abstract class AbstractApi extends MLog implements MicroApi {
     		((AbstractDiscovery)obj).doInit(this);
     	discovery.add(obj);
     	
-    	publishToAll(obj);
     }
 
 	public void addPublisher(MicroPublisher obj) {
@@ -41,31 +64,69 @@ public abstract class AbstractApi extends MLog implements MicroApi {
     	publishers.add(obj);
     	publishAll(obj);
     }
+	
+	public void addProtocol(MicroProtocol obj) {
+		for (String proto : obj.getNames())
+			addProtocol(proto, obj);
+	}
 
-    private void publishToAll(MicroDiscovery obj) {
-    	obj.discover(MicroFilter.ALL, desc -> publishers.forEach( p -> p.push(desc) ));
+	public void addProtocol(String name, MicroProtocol obj) {
+		protocols.put(name, obj);
+		if (obj instanceof AbstractProtocol)
+			((AbstractProtocol)obj).doInit(this);
+	}
+	
+    private void publishToAll(MicroProvider obj) {
+    	obj.discover(
+    			desc -> { 
+		    		if (!isLocal(desc)) 
+		    			publishers.forEach( p -> { try {
+		    	        	p.push(desc);
+		    	        } catch (Throwable t) {
+		    	        	log().e(desc,p,t);
+		    	        } } ); 
+    			} );
 	}
 
 	private void publishAll(MicroPublisher obj) {
-		discovery.forEach(v -> v.discover(MicroFilter.ALL, f -> obj.push(f) ));
-	}
-
-
-	@Override
-	public List<MicroResult> execute(MicroFilter filter, IConfig arguments, IProperties properties) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		providers.forEach(v -> v.discover(
+				desc -> {
+					if (!isLocal(desc))
+						obj.push(desc);
+				} ));
 	}
 
 	@Override
-	public void operations(MicroFilter filter, Consumer<MicroOperation> results) {
-		
+	public void discover(Consumer<OperationDescription> action) {
+		discovery.forEach(d -> d.discover(desc -> {
+        	try {
+        		action.accept(desc);
+        	} catch (Throwable t) {
+        		log().e(desc,t);
+        	}
+		}) );
 	}
 
 	@Override
-	public void discover(MicroFilter filter, Consumer<OperationDescription> results) {
-		// TODO Auto-generated method stub
-		
+	public MicroResult execute(OperationDescription desc, IConfig arguments, IProperties properties)
+			throws Exception {
+		MicroProtocol executor = getProtoExecutor(desc);
+		MicroResult res = executor.execute(desc, arguments, properties);
+		return res;
 	}
+
+	private MicroProtocol getProtoExecutor(OperationDescription desc) {
+		String proto = desc.getLabels().getString(C.LABEL_PROTO, "");
+		MicroProtocol executor = protocols.get(proto);
+		if (executor == null)
+			throw new UnknownProtocolException(proto);
+		return executor;
+	}
+
+	public boolean isLocal(OperationDescription desc) {
+		if (desc == null) return true;
+		return desc.getLabels().getBoolean(C.LABEL_LOCAL, false);
+	}
+
 
 }
