@@ -1,4 +1,4 @@
-package de.mhus.micro.core.util;
+package de.mhus.micro.core.impl;
 
 import de.mhus.micro.core.api.MicroProvider;
 

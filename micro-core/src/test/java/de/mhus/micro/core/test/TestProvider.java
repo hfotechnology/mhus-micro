@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import de.mhus.lib.core.operation.OperationDescription;
-import de.mhus.micro.core.util.AbstractProvider;
+import de.mhus.micro.core.impl.AbstractProvider;
 
 public class TestProvider extends AbstractProvider {
 

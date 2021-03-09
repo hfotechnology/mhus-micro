@@ -16,7 +16,7 @@ import de.mhus.lib.jms.JmsConnection;
 import de.mhus.lib.jms.JmsDestination;
 import de.mhus.lib.jms.MJms;
 import de.mhus.micro.core.api.MicroResult;
-import de.mhus.micro.core.util.AbstractProtocol;
+import de.mhus.micro.core.impl.AbstractProtocol;
 
 public class JmsProtocol extends AbstractProtocol {
 

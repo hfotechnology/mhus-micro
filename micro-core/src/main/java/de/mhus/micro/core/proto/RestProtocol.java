@@ -17,7 +17,7 @@ import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.parser.StringCompiler;
 import de.mhus.micro.core.api.C;
 import de.mhus.micro.core.api.MicroResult;
-import de.mhus.micro.core.util.AbstractProtocol;
+import de.mhus.micro.core.impl.AbstractProtocol;
 
 public class RestProtocol extends AbstractProtocol {
 

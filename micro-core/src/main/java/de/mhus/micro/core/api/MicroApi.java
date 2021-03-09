@@ -23,7 +23,7 @@ public interface MicroApi {
      * @return list of results
      * @throws Exception 
      */
-    default List<MicroResult> execute(MicroFilter filter, IConfig arguments, IProperties properties) throws Exception {
+    default List<MicroResult> executeAll(MicroFilter filter, IConfig arguments, IProperties properties) throws Exception {
     	List<MicroResult> out = new ArrayList<>();
     	discover(filter, desc -> {
     		try {

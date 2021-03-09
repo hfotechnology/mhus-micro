@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import de.mhus.lib.core.operation.OperationDescription;
-import de.mhus.micro.core.util.AbstractPublisher;
+import de.mhus.micro.core.impl.AbstractPublisher;
 
 public class TestPublisher extends AbstractPublisher {
 

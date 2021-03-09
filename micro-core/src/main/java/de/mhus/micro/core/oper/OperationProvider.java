@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import de.mhus.lib.core.operation.Operation;
 import de.mhus.lib.core.operation.OperationDescription;
-import de.mhus.micro.core.util.AbstractProvider;
+import de.mhus.micro.core.impl.AbstractProvider;
 
 public abstract class OperationProvider extends AbstractProvider {
 

@@ -18,7 +18,7 @@ import de.mhus.lib.core.util.Version;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.form.ModelUtil;
 import de.mhus.micro.core.api.C;
-import de.mhus.micro.core.util.AbstractProvider;
+import de.mhus.micro.core.impl.AbstractProvider;
 
 public class ConfigProvider extends AbstractProvider {
 

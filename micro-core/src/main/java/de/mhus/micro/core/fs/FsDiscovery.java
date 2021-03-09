@@ -19,7 +19,7 @@ import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.form.ModelUtil;
 import de.mhus.micro.core.api.C;
-import de.mhus.micro.core.util.AbstractDiscovery;
+import de.mhus.micro.core.impl.AbstractDiscovery;
 
 public class FsDiscovery extends AbstractDiscovery {
 

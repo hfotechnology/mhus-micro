@@ -11,7 +11,7 @@ import de.mhus.lib.core.operation.Operation;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.micro.core.api.MicroResult;
-import de.mhus.micro.core.util.AbstractProtocol;
+import de.mhus.micro.core.impl.AbstractProtocol;
 
 public class LocalOperationProtocol extends AbstractProtocol {
 
@@ -31,6 +31,7 @@ public class LocalOperationProtocol extends AbstractProtocol {
 			OperationResult res = oper.doExecute(context);
 			return new MicroResult(res.isSuccessful(), res.getReturnCode(), res.getMsg(), desc, res.getResultAsConfig());
 		} catch (Throwable e) {
+			log().d(desc,e);
 			return new MicroResult(desc, e);
 		}
 		

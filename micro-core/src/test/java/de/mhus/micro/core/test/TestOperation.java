@@ -13,6 +13,7 @@ public class TestOperation extends AbstractOperation {
 
 	@Override
 	protected OperationResult doExecute2(TaskContext context) throws Exception {
+		log().i("execute");
 		done  = true;
 		return new Successful(this);
 	}

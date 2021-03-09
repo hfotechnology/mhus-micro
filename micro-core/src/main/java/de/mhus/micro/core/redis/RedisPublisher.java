@@ -11,7 +11,7 @@ import de.mhus.lib.core.definition.DefRoot;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.form.ModelUtil;
 import de.mhus.micro.core.api.C;
-import de.mhus.micro.core.util.AbstractPublisher;
+import de.mhus.micro.core.impl.AbstractPublisher;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
