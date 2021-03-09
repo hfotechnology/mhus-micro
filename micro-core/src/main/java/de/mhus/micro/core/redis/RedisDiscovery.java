@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MProperties;
@@ -107,8 +107,11 @@ public class RedisDiscovery extends AbstractDiscovery {
     }
     
     @Override
-    public void discover(Consumer<OperationDescription> action) {
-		descriptions.values().forEach(d -> action.accept(d));
+    public Boolean discover(Function<OperationDescription,Boolean> action) {
+		for ( OperationDescription desc : descriptions.values())
+			if (!action.apply(desc) )
+				return Boolean.FALSE;
+		return Boolean.TRUE;
     }
 
 	@Override

@@ -2,11 +2,14 @@ package de.mhus.micro.core.api;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.OperationDescription;
+import de.mhus.lib.core.util.Value;
+import de.mhus.lib.errors.NotFoundException;
+import de.mhus.micro.core.filter.FilterPathVersion;
 
 public interface MicroApi {
 
@@ -28,6 +31,7 @@ public interface MicroApi {
     		} catch (Throwable t) {
     			out.add(new MicroResult(desc, t));
     		}
+    		return Boolean.TRUE;
     	} );
     	return out;
     }
@@ -35,13 +39,31 @@ public interface MicroApi {
     /**
      * Execute the operation and returns the result.
      * 
-     * @param operation
+     * @param description
      * @param arguments
      * @param properties
      * @return
      * @throws Exception
      */
-    MicroResult execute(OperationDescription operation, IConfig arguments, IProperties properties) throws Exception;
+    MicroResult execute(OperationDescription description, IConfig arguments, IProperties properties) throws Exception;
+    
+    default MicroResult execute(String pathVersion, IConfig arguments, IProperties properties) throws Exception {
+    	OperationDescription description = first(new FilterPathVersion(pathVersion));
+    	if (description == null) throw new NotFoundException("@Operation for path $1 not found",pathVersion);
+    	return execute(description, arguments, properties);
+    }
+    
+    default OperationDescription first(MicroFilter filter) {
+    	Value<OperationDescription> first = new Value<>();
+    	discover(desc -> {
+    		if (filter.matches(desc)) {
+    			first.value = desc;
+    			return Boolean.FALSE;
+    		}
+    		return Boolean.TRUE;
+    	});
+    	return first.value;
+    }
     
     /**
      * Return all known operation descriptions that matches the filter.
@@ -49,10 +71,11 @@ public interface MicroApi {
      * @param filter
      * @param action
      */
-    default void discover(MicroFilter filter, Consumer<OperationDescription> action) {
+    default void discover(MicroFilter filter, Function<OperationDescription,Boolean> action) {
     	discover(desc -> {
     		if (filter.matches(desc))
-    			action.accept(desc);
+    			return action.apply(desc);
+    		return Boolean.TRUE;
     	});
     }
     
@@ -62,6 +85,6 @@ public interface MicroApi {
      * @param filter
      * @param results
      */
-    void discover(Consumer<OperationDescription> action);
+    void discover(Function<OperationDescription,Boolean> action);
 
 }

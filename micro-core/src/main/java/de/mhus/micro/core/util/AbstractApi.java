@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.MLog;
@@ -84,7 +84,8 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 		    	        	p.push(desc);
 		    	        } catch (Throwable t) {
 		    	        	log().e(desc,p,t);
-		    	        } } ); 
+		    	        } } );
+		    		return Boolean.TRUE;
     			} );
 	}
 
@@ -93,18 +94,22 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 				desc -> {
 					if (!isLocal(desc))
 						obj.push(desc);
+					return Boolean.TRUE;
 				} ));
 	}
 
 	@Override
-	public void discover(Consumer<OperationDescription> action) {
-		discovery.forEach(d -> d.discover(desc -> {
-        	try {
-        		action.accept(desc);
-        	} catch (Throwable t) {
-        		log().e(desc,t);
-        	}
-		}) );
+	public void discover(Function<OperationDescription,Boolean> action) {
+		for (MicroDiscovery d : discovery) {
+			if (!d.discover(desc -> {
+				try {
+					return action.apply(desc);
+				} catch (Throwable t) {
+					log().e(desc,t);
+				}
+				return Boolean.TRUE;
+			})) return;
+		}
 	}
 
 	@Override
@@ -128,5 +133,8 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 		return desc.getLabels().getBoolean(C.LABEL_LOCAL, false);
 	}
 
+	public void check() {
+		discovery.forEach(d -> d.check() );
+	}
 
 }

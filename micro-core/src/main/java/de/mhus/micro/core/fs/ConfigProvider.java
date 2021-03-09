@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
@@ -108,8 +108,11 @@ public class ConfigProvider extends AbstractProvider {
 	}
 	
 	@Override
-	public void discover(Consumer<OperationDescription> action) {
-		list.forEach( v -> action.accept(v) );
+	public Boolean discover(Function<OperationDescription,Boolean> action) {
+		for ( OperationDescription desc : list)
+			if (!action.apply(desc) )
+				return Boolean.FALSE;
+		return Boolean.TRUE;
 	}
 
 }

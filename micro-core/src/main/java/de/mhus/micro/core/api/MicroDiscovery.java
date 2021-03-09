@@ -1,6 +1,6 @@
 package de.mhus.micro.core.api;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import de.mhus.lib.core.operation.OperationDescription;
 
@@ -25,6 +25,6 @@ public interface MicroDiscovery {
      * Call action for each known operation.
      * @param action
      */
-	void discover(Consumer<OperationDescription> action);
+	Boolean discover(Function<OperationDescription,Boolean> action);
     
 }

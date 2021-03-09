@@ -38,7 +38,7 @@ public class SimpleTest extends TestCase {
 				oper3 = desc;
 			
 			cnt.value++;
-			
+			return Boolean.TRUE;
 		} );
 		
 		assertEquals(3, cnt.value);

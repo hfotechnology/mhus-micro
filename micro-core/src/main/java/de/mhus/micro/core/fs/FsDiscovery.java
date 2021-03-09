@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
@@ -80,11 +80,20 @@ public class FsDiscovery extends AbstractDiscovery {
 			}
 			
 			MProperties labels = null;
-			for (Entry<String, Object> label : entry.getObject(C.DATA_LABELS).entrySet()) {
-				if (labels == null) labels = new MProperties();
-				labels.put(label.getKey(), String.valueOf( label.getValue() ));
+			
+			// as sub config
+			if (entry.isObject(C.DATA_LABELS))
+				for (Entry<String, Object> label : entry.getObject(C.DATA_LABELS).entrySet()) {
+					if (labels == null) labels = new MProperties();
+					labels.put(label.getKey(), String.valueOf( label.getValue() ));
+				}
+				
+			// or as parameters
+			for (Entry<String, Object> label : entry.entrySet()) {
+				if (label.getKey().startsWith(C.DATA_LABEL_DOT)) {
+					labels.put(label.getKey().substring(C.DATA_LABEL_DOT.length()), label.getValue());
+				}
 			}
-						
 			OperationDescription desc = new OperationDescription(uuid, path, version, null, title, labels, form );
 			
 			descriptions.put(file.getName(),desc);
@@ -96,8 +105,11 @@ public class FsDiscovery extends AbstractDiscovery {
 	}
 
 	@Override
-	public void discover( Consumer<OperationDescription> action) {
-		descriptions.values().forEach(d -> action.accept(d));
+	public Boolean discover(Function<OperationDescription,Boolean> action) {
+		for ( OperationDescription desc : descriptions.values())
+			if (!action.apply(desc) )
+				return Boolean.FALSE;
+		return Boolean.TRUE;
 	}
 
 }

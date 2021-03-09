@@ -40,14 +40,30 @@ public class FsTest extends TestCase {
 				"Operation 1",
 				null);
 		
+		// add one
+		
 		pubProvider.add(pubDesc1);
 		
-		disDiscovery.check();
+		disApi.check();
 		
-		ArrayList<OperationDescription> list = new ArrayList<>(1);
-		disApi.discover(o -> list.add(o));
+		{
+			ArrayList<OperationDescription> list = new ArrayList<>(1);
+			disApi.discover(o -> {list.add(o);return Boolean.TRUE;});
+			
+			assertEquals(1, list.size());
+		}
 		
-		assertEquals(1, list.size());
+		// remove one
+		
+		pubProvider.remove(pubDesc1);
+		
+		disApi.check();
+		{
+			ArrayList<OperationDescription> list = new ArrayList<>(1);
+			disApi.discover(o -> {list.add(o);return Boolean.TRUE;});
+			
+			assertEquals(0, list.size());
+		}
 		
 	}
 	
