@@ -62,6 +62,10 @@
             <artifactId>jms-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>de.mhus.rest</groupId>
+            <artifactId>rest-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>de.mhus.lib</groupId>
             <artifactId>lib-junit</artifactId>
         </dependency>
