@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.DefaultTaskContext;
 import de.mhus.lib.core.operation.Operation;
@@ -19,7 +19,7 @@ public class LocalOperationProtocol extends AbstractProtocol {
 	private Map<String,Operation> operations = Collections.synchronizedMap(new HashMap<>());
 	
 	@Override
-	public MicroResult execute(OperationDescription desc, IConfig arguments, IProperties properties) {
+	public MicroResult execute(OperationDescription desc, IConfig arguments, IReadProperties properties) {
 
 		String key = desc.getPathVersion();
 		Operation oper = operations.get(key);
@@ -29,7 +29,7 @@ public class LocalOperationProtocol extends AbstractProtocol {
 
 		try {
 			OperationResult res = oper.doExecute(context);
-			return new MicroResult(res.isSuccessful(), res.getReturnCode(), res.getMsg(), desc, res.getResultAsConfig());
+			return new MicroResult(res.isSuccessful(), res.getReturnCode(), res.getMsg(), desc, res.getResultAsConfig(), properties);
 		} catch (Throwable e) {
 			log().d(desc,e);
 			return new MicroResult(desc, e);

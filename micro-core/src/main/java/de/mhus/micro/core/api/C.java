@@ -20,6 +20,8 @@ public class C {
 	public static final String LABEL_LOCAL = "@local";
 	public static final String REST_URL = "@url";
 	public static final String REST_METHOD = "@method";
+	public static final String PROTO_REST = "rest";
+	public static final String REST_HOST = "@host";
 	
 	public static String getUniqueId(OperationDescription desc) {
 		return desc.getPath() + "-" + desc.getUuid() + "-" + desc.getLabels().getString(C.LABEL_PROTO, "");

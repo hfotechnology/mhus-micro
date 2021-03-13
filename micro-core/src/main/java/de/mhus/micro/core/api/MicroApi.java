@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Value;
@@ -45,9 +46,9 @@ public interface MicroApi {
      * @return
      * @throws Exception
      */
-    MicroResult execute(OperationDescription description, IConfig arguments, IProperties properties) throws Exception;
+    MicroResult execute(OperationDescription description, IConfig arguments, IReadProperties properties) throws Exception;
     
-    default MicroResult execute(String pathVersion, IConfig arguments, IProperties properties) throws Exception {
+    default MicroResult execute(String pathVersion, IConfig arguments, IReadProperties properties) throws Exception {
     	OperationDescription description = first(new FilterPathVersion(pathVersion));
     	if (description == null) throw new NotFoundException("@Operation for path $1 not found",pathVersion);
     	return execute(description, arguments, properties);

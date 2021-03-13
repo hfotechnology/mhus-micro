@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.OperationDescription;
@@ -112,14 +112,6 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 		}
 	}
 
-	@Override
-	public MicroResult execute(OperationDescription desc, IConfig arguments, IProperties properties)
-			throws Exception {
-		MicroProtocol executor = getProtoExecutor(desc);
-		MicroResult res = executor.execute(desc, arguments, properties);
-		return res;
-	}
-
 	private MicroProtocol getProtoExecutor(OperationDescription desc) {
 		String proto = desc.getLabels().getString(C.LABEL_PROTO, "");
 		MicroProtocol executor = protocols.get(proto);
@@ -136,5 +128,14 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 	public void check() {
 		discovery.forEach(d -> d.check() );
 	}
+
+	@Override
+	public MicroResult execute(OperationDescription desc, IConfig arguments, IReadProperties properties)
+			throws Exception {
+		MicroProtocol executor = getProtoExecutor(desc);
+		MicroResult res = executor.execute(desc, arguments, properties);
+		return res;
+	}
+
 
 }

@@ -1,12 +1,15 @@
 package de.mhus.micro.core.proto;
 
+import java.util.Enumeration;
+
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.apache.shiro.subject.Subject;
 
-import de.mhus.lib.core.IProperties;
+import de.mhus.lib.core.IReadProperties;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.aaa.Aaa;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.OperationDescription;
@@ -27,7 +30,7 @@ public class JmsProtocol extends AbstractProtocol {
 	private JmsConnection con = null;
 	
 	@Override
-	public MicroResult execute(OperationDescription desc, IConfig arguments, IProperties properties) {
+	public MicroResult execute(OperationDescription desc, IConfig arguments, IReadProperties properties) {
 
 		try {
 	        String queue = desc.getLabels().getString("queue");
@@ -52,6 +55,13 @@ public class JmsProtocol extends AbstractProtocol {
 	                msg.setText(json);
 	                Message res = client.sendJms(msg);
 	                
+	                MProperties config = new MProperties();
+	                for ( @SuppressWarnings("unchecked")
+					Enumeration<String> enu = res.getPropertyNames();enu.hasMoreElements();) {
+	                	String name = enu.nextElement();
+	                	config.put(name, res.getObjectProperty(name));
+	                }
+
 	                int rc = res.getIntProperty("rc");
 	                String mesg = res.getStringProperty("msg");
 	                boolean successful = res.getBooleanProperty("successful");
@@ -64,7 +74,7 @@ public class JmsProtocol extends AbstractProtocol {
 	                    result = MJms.getMapConfig((MapMessage)res);
 	                }
 	    
-	                return new MicroResult(successful, rc, mesg, desc, result);
+	                return new MicroResult(successful, rc, mesg, desc, result, config);
 	    
 	            }
 	        }

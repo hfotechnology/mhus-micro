@@ -1,5 +1,6 @@
 package de.mhus.micro.core.api;
 
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.OperationDescription;
 
@@ -13,13 +14,15 @@ public class MicroResult {
     private String msg;
     private boolean transportSuccessful;
 	private Throwable error;
+	private IReadProperties properties;
 
-    public MicroResult(boolean transportSuccessful, int rc, String msg, OperationDescription description, IConfig result) {
+    public MicroResult(boolean transportSuccessful, int rc, String msg, OperationDescription description, IConfig result, IReadProperties properties) {
         this.transportSuccessful = transportSuccessful;
         this.rc = rc;
         this.msg = msg;
         this.description = description;
         this.result = result;
+        this.properties = properties;
     }
     public MicroResult(OperationDescription desc, Throwable t) {
         this.transportSuccessful = false;
@@ -49,7 +52,9 @@ public class MicroResult {
     public Throwable getError() {
     	return error;
     }
-    
+    public IReadProperties getProperties() {
+    	return properties;
+    }
     
     @Override
     public String toString() {
