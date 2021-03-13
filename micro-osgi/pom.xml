@@ -41,11 +41,11 @@
 							de.mhus.micro.osgi.*;version=${project.version},
 						</Export-Package>
 						<Import-Package>
+                          redis.clients.jedis.*;resolution:=optional
 						  *
 						</Import-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
 						<Service-Component>de.mhus.micro.osgi.*</Service-Component>
-						<Embed-Dependency>micro-core</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>
