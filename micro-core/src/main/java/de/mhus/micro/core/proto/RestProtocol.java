@@ -24,22 +24,22 @@ import de.mhus.lib.core.io.http.MHttp;
 import de.mhus.lib.core.io.http.MHttpClientBuilder;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.parser.StringCompiler;
-import de.mhus.micro.core.api.C;
+import de.mhus.micro.core.api.Micro;
 import de.mhus.micro.core.api.MicroResult;
 import de.mhus.micro.core.impl.AbstractProtocol;
 
 public class RestProtocol extends AbstractProtocol {
 
-	private static final String[] PROTOCOLS = new String[] {C.PROTO_REST,"http","https"};
+	private static final String[] PROTOCOLS = new String[] {Micro.PROTO_REST,"http","https"};
 	private HttpClient client = new MHttpClientBuilder().getHttpClient();
 	
 	@Override
 	public MicroResult execute(OperationDescription desc, IConfig arguments, IReadProperties properties) {
 
 		try {
-	        String uri = desc.getLabels().getString(C.REST_URL);
-	        String host = desc.getLabels().getString(C.REST_HOST, null);
-	        String method = desc.getLabels().getString(C.REST_METHOD, MHttp.METHOD_POST);
+	        String uri = desc.getLabels().getString(Micro.REST_URL);
+	        String host = desc.getLabels().getString(Micro.REST_HOST, null);
+	        String method = desc.getLabels().getString(Micro.REST_METHOD, MHttp.METHOD_POST);
 	        
 	        if (host != null) {
 	        	host = hostMapping(host);

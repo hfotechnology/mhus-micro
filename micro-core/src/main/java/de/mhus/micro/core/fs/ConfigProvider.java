@@ -17,7 +17,7 @@ import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.form.ModelUtil;
-import de.mhus.micro.core.api.C;
+import de.mhus.micro.core.api.Micro;
 import de.mhus.micro.core.impl.AbstractProvider;
 
 public class ConfigProvider extends AbstractProvider {
@@ -67,19 +67,19 @@ public class ConfigProvider extends AbstractProvider {
 		
 		for (IConfig entry : config.getArrayOrCreate(IConfig.NAMELESS_VALUE)) {
 			try {
-				UUID uuid = UUID.fromString( entry.getStringOrCreate(C.DATA_UUID, x -> UUID.randomUUID().toString()) );
-				String path = entry.getString(C.DATA_PATH);
-				String title = entry.getString(C.DATA_TITLE, path);
-				Version version = new Version( entry.getStringOrCreate(C.DATA_VERSION, x -> Version.V_0_0_0.toString()));
+				UUID uuid = UUID.fromString( entry.getStringOrCreate(Micro.DATA_UUID, x -> UUID.randomUUID().toString()) );
+				String path = entry.getString(Micro.DATA_PATH);
+				String title = entry.getString(Micro.DATA_TITLE, path);
+				Version version = new Version( entry.getStringOrCreate(Micro.DATA_VERSION, x -> Version.V_0_0_0.toString()));
 				
 				DefRoot form = null;
-				String formStr = entry.getString(C.DATA_FORM, null);
+				String formStr = entry.getString(Micro.DATA_FORM, null);
 				if (formStr != null) {
 					form = ModelUtil.fromJson(formStr);
 				}
 				
 				MProperties labels = null;
-				for (Entry<String, Object> label : entry.getObject(C.DATA_LABELS).entrySet()) {
+				for (Entry<String, Object> label : entry.getObject(Micro.DATA_LABELS).entrySet()) {
 					if (labels == null) labels = new MProperties();
 					labels.put(label.getKey(), String.valueOf( label.getValue() ));
 				}

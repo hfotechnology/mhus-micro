@@ -1,8 +1,10 @@
 package de.mhus.micro.core.api;
 
+import de.mhus.lib.core.M;
 import de.mhus.lib.core.operation.OperationDescription;
+import de.mhus.micro.core.impl.services.MicroApiServiceProvider;
 
-public class C {
+public class Micro {
     public static final String DATA_UUID = "uuid";
     public static final String DATA_PATH = "path";
     public static final String DATA_VERSION = "version";
@@ -24,8 +26,12 @@ public class C {
 	public static final String REST_HOST = "@host";
 	
 	public static String getUniqueId(OperationDescription desc) {
-		return desc.getPath() + "-" + desc.getUuid() + "-" + desc.getLabels().getString(C.LABEL_PROTO, "");
+		return desc.getPath() + "-" + desc.getUuid() + "-" + desc.getLabels().getString(Micro.LABEL_PROTO, "");
 	}
 
+	public MicroApi get() {
+		return M.l(MicroApiServiceProvider.class).getApi();
+	}
+	
 }
 

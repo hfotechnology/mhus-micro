@@ -11,7 +11,7 @@ import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.IntValue;
 import de.mhus.lib.errors.MException;
 import de.mhus.lib.tests.TestCase;
-import de.mhus.micro.core.api.C;
+import de.mhus.micro.core.api.Micro;
 import de.mhus.micro.core.fs.ConfigProvider;
 
 public class SimpleTest extends TestCase {
@@ -47,9 +47,9 @@ public class SimpleTest extends TestCase {
 		assertNotNull(oper2);
 		assertNotNull(oper3);
 		
-		assertEquals("rest", oper1.getLabels().get(C.LABEL_PROTO));
-		assertEquals("rest", oper2.getLabels().get(C.LABEL_PROTO));
-		assertEquals("local", oper3.getLabels().get(C.LABEL_PROTO));
+		assertEquals("rest", oper1.getLabels().get(Micro.LABEL_PROTO));
+		assertEquals("rest", oper2.getLabels().get(Micro.LABEL_PROTO));
+		assertEquals("local", oper3.getLabels().get(Micro.LABEL_PROTO));
 		
 	}
 	

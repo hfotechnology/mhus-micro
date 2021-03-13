@@ -58,6 +58,7 @@
 	
 	<modules>
         <module>micro-core</module>
+        <module>micro-osgi</module>
      </modules>
 
 </project>

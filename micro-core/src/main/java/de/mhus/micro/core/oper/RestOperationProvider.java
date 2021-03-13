@@ -3,7 +3,7 @@ package de.mhus.micro.core.oper;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.io.http.MHttp;
 import de.mhus.lib.core.operation.OperationDescription;
-import de.mhus.micro.core.api.C;
+import de.mhus.micro.core.api.Micro;
 
 public class RestOperationProvider extends OperationProvider {
 
@@ -13,10 +13,10 @@ public class RestOperationProvider extends OperationProvider {
 	@Override
 	protected OperationDescription cloneDescription(OperationDescription description) {
 		OperationDescription out = new OperationDescription(description);
-		((MProperties)out.getLabels()).setString(C.LABEL_PROTO, C.PROTO_REST);
-		((MProperties)out.getLabels()).setString(C.REST_METHOD, MHttp.METHOD_POST);
-		((MProperties)out.getLabels()).setString(C.REST_URL, baseUrl + description.getPathVersion() ); // use UUID?
-		((MProperties)out.getLabels()).setString(C.REST_HOST, host);
+		((MProperties)out.getLabels()).setString(Micro.LABEL_PROTO, Micro.PROTO_REST);
+		((MProperties)out.getLabels()).setString(Micro.REST_METHOD, MHttp.METHOD_POST);
+		((MProperties)out.getLabels()).setString(Micro.REST_URL, baseUrl + description.getPathVersion() ); // use UUID?
+		((MProperties)out.getLabels()).setString(Micro.REST_HOST, host);
 		
 		return out;
 	}

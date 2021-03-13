@@ -13,7 +13,7 @@ import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.micro.core.api.MicroResult;
 import de.mhus.micro.core.impl.AbstractProtocol;
 
-public class LocalOperationProtocol extends AbstractProtocol {
+public class LocalOperationProtocol extends AbstractProtocol implements OperationTracker {
 
 	private static final String[] PROTOCOL = new String[] {"operation"};
 	private Map<String,Operation> operations = Collections.synchronizedMap(new HashMap<>());
@@ -22,7 +22,7 @@ public class LocalOperationProtocol extends AbstractProtocol {
 	public MicroResult execute(OperationDescription desc, IConfig arguments, IReadProperties properties) {
 
 		String key = desc.getPathVersion();
-		Operation oper = operations.get(key);
+		Operation oper = findOperation(key);
 		
 		DefaultTaskContext context = new DefaultTaskContext(oper.getClass());
 		context.setParameters(arguments);
@@ -37,11 +37,16 @@ public class LocalOperationProtocol extends AbstractProtocol {
 		
 	}
 
+	protected Operation findOperation(String key) {
+		return  operations.get(key);
+	}
+
 	@Override
 	public String[] getNames() {
 		return PROTOCOL;
 	}
 
+	@Override
 	public void add(Operation oper) {
 		OperationDescription desc = oper.getDescription();
 		String key = desc.getPathVersion();
@@ -49,6 +54,7 @@ public class LocalOperationProtocol extends AbstractProtocol {
 		operations.put(key, oper);
 	}
 
+	@Override
 	public void remove(Operation oper) {
 		OperationDescription desc = oper.getDescription();
 		String key = desc.getPathVersion();

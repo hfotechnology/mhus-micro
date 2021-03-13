@@ -18,7 +18,7 @@ import de.mhus.lib.core.definition.DefRoot;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.form.ModelUtil;
-import de.mhus.micro.core.api.C;
+import de.mhus.micro.core.api.Micro;
 import de.mhus.micro.core.impl.AbstractDiscovery;
 
 public class FsDiscovery extends AbstractDiscovery {
@@ -56,11 +56,11 @@ public class FsDiscovery extends AbstractDiscovery {
 
 	@Override
 	public synchronized void reload() {
-		descriptions.forEach((k,v) -> ((MProperties)v.getLabels()).put(C.LABEL_DEPRECATED, "true") );
+		descriptions.forEach((k,v) -> ((MProperties)v.getLabels()).put(Micro.LABEL_DEPRECATED, "true") );
 		for (File file : dir.listFiles())
 			if (file.isFile())
 				load(file);
-		descriptions.values().removeIf(v -> v.getLabels().containsKey(C.LABEL_DEPRECATED));
+		descriptions.values().removeIf(v -> v.getLabels().containsKey(Micro.LABEL_DEPRECATED));
 	}
 
 	private void load(File file) {
@@ -68,13 +68,13 @@ public class FsDiscovery extends AbstractDiscovery {
 		try {
 			IConfig entry = factory.read(file);
 			
-			UUID uuid = UUID.fromString( entry.getStringOrCreate(C.DATA_UUID, x -> UUID.randomUUID().toString()) );
-			String path = entry.getString(C.DATA_PATH);
-			String title = entry.getString(C.DATA_TITLE, path);
-			Version version = new Version( entry.getStringOrCreate(C.DATA_VERSION, x -> Version.V_0_0_0.toString()));
+			UUID uuid = UUID.fromString( entry.getStringOrCreate(Micro.DATA_UUID, x -> UUID.randomUUID().toString()) );
+			String path = entry.getString(Micro.DATA_PATH);
+			String title = entry.getString(Micro.DATA_TITLE, path);
+			Version version = new Version( entry.getStringOrCreate(Micro.DATA_VERSION, x -> Version.V_0_0_0.toString()));
 			
 			DefRoot form = null;
-			String formStr = entry.getString(C.DATA_FORM, null);
+			String formStr = entry.getString(Micro.DATA_FORM, null);
 			if (formStr != null) {
 				form = ModelUtil.fromJson(formStr);
 			}
@@ -82,16 +82,16 @@ public class FsDiscovery extends AbstractDiscovery {
 			MProperties labels = null;
 			
 			// as sub config
-			if (entry.isObject(C.DATA_LABELS))
-				for (Entry<String, Object> label : entry.getObject(C.DATA_LABELS).entrySet()) {
+			if (entry.isObject(Micro.DATA_LABELS))
+				for (Entry<String, Object> label : entry.getObject(Micro.DATA_LABELS).entrySet()) {
 					if (labels == null) labels = new MProperties();
 					labels.put(label.getKey(), String.valueOf( label.getValue() ));
 				}
 				
 			// or as parameters
 			for (Entry<String, Object> label : entry.entrySet()) {
-				if (label.getKey().startsWith(C.DATA_LABEL_DOT)) {
-					labels.put(label.getKey().substring(C.DATA_LABEL_DOT.length()), label.getValue());
+				if (label.getKey().startsWith(Micro.DATA_LABEL_DOT)) {
+					labels.put(label.getKey().substring(Micro.DATA_LABEL_DOT.length()), label.getValue());
 				}
 			}
 			OperationDescription desc = new OperationDescription(uuid, path, version, null, title, labels, form );

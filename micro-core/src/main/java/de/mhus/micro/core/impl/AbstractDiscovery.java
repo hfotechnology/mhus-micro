@@ -11,4 +11,8 @@ public abstract class AbstractDiscovery extends MLog implements MicroDiscovery {
         this.api = api;
     }
     
+	public void doDestroy() {
+		
+	}
+
 }

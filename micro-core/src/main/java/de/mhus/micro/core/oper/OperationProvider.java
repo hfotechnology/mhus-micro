@@ -9,7 +9,7 @@ import de.mhus.lib.core.operation.Operation;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.micro.core.impl.AbstractProvider;
 
-public abstract class OperationProvider extends AbstractProvider {
+public abstract class OperationProvider extends AbstractProvider implements OperationTracker {
 
 	protected Map<String, OperationDescription> descriptions = Collections.synchronizedMap(new HashMap<>());
 	
@@ -31,6 +31,7 @@ public abstract class OperationProvider extends AbstractProvider {
 		return Boolean.TRUE;
 	}
 	
+	@Override
 	public void add(Operation oper) {
 		OperationDescription desc = oper.getDescription();
 		desc = cloneDescription(oper.getDescription());
@@ -41,6 +42,7 @@ public abstract class OperationProvider extends AbstractProvider {
 			api.updateDescription(desc);
 	}
 	
+	@Override
 	public void remove(Operation oper) {
 		OperationDescription desc = oper.getDescription();
 		String key = desc.getPathVersion();

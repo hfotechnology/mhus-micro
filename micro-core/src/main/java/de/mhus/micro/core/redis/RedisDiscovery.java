@@ -12,7 +12,7 @@ import de.mhus.lib.core.definition.DefRoot;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.form.ModelUtil;
-import de.mhus.micro.core.api.C;
+import de.mhus.micro.core.api.Micro;
 import de.mhus.micro.core.impl.AbstractDiscovery;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -37,10 +37,10 @@ public class RedisDiscovery extends AbstractDiscovery {
     @Override
     public synchronized void reload() {
     	try (Jedis con = pool.getResource()) {
-	        descriptions.forEach((k,v) -> ((IProperties)v.getLabels()).put(C.LABEL_DEPRECATED, "true") );
+	        descriptions.forEach((k,v) -> ((IProperties)v.getLabels()).put(Micro.LABEL_DEPRECATED, "true") );
 	        for (String name : con.keys(SEARCH))
 	            load(name);
-	        descriptions.values().removeIf(v -> v.getLabels().containsKey(C.LABEL_DEPRECATED));
+	        descriptions.values().removeIf(v -> v.getLabels().containsKey(Micro.LABEL_DEPRECATED));
     	}
     }
 
@@ -49,17 +49,17 @@ public class RedisDiscovery extends AbstractDiscovery {
 	        Map<String, String> data = con.hgetAll(name);
 	        OperationDescription cur = descriptions.get(name);
 	
-	        if (!data.containsKey(C.DATA_PATH)) {
+	        if (!data.containsKey(Micro.DATA_PATH)) {
 	            log().d("@Ignore entry $1 without path",name);
 	        }
 	        
 	        // path
-	        String path = data.get(C.DATA_PATH);
+	        String path = data.get(Micro.DATA_PATH);
 	
 	        // uuid
 	        UUID uuid = null;
-	        if (data.containsKey(C.DATA_UUID))
-	            uuid = UUID.fromString(data.get(C.DATA_UUID));
+	        if (data.containsKey(Micro.DATA_UUID))
+	            uuid = UUID.fromString(data.get(Micro.DATA_UUID));
 	        else if (cur != null)
 	            uuid = cur.getUuid();
 	        else
@@ -67,18 +67,18 @@ public class RedisDiscovery extends AbstractDiscovery {
 	        
 	        // version
 	        Version version = null;
-	        if (data.containsKey(C.DATA_VERSION))
-	            version = new Version(data.get(C.DATA_VERSION));
+	        if (data.containsKey(Micro.DATA_VERSION))
+	            version = new Version(data.get(Micro.DATA_VERSION));
 	        else
 	            version = Version.V_0_0_0;
 	        
 	        // title
-	        String title = data.getOrDefault(C.DATA_TITLE, path);
+	        String title = data.getOrDefault(Micro.DATA_TITLE, path);
 	
 	        // form
 	        DefRoot form = null;
-	        if (data.containsKey(C.DATA_FORM)) {
-	            String formStr = data.get(C.DATA_FORM);
+	        if (data.containsKey(Micro.DATA_FORM)) {
+	            String formStr = data.get(Micro.DATA_FORM);
 	            try {
 	                form = ModelUtil.fromJson(formStr);
 	            } catch (Throwable t) {
@@ -95,10 +95,10 @@ public class RedisDiscovery extends AbstractDiscovery {
 	
 	        // labels
 	         ((MProperties)desc.getLabels()).clear();
-	         ((MProperties)desc.getLabels()).putReadProperties( IProperties.subsetCrop(C.DATA_LABEL_DOT, data));
+	         ((MProperties)desc.getLabels()).putReadProperties( IProperties.subsetCrop(Micro.DATA_LABEL_DOT, data));
 	         IProperties.updateFunctional((MProperties)desc.getLabels());
 	         
-	         ((MProperties)desc.getLabels()).remove(C.LABEL_DEPRECATED);
+	         ((MProperties)desc.getLabels()).remove(Micro.LABEL_DEPRECATED);
 	         // desc.getLabels().put(C.LABEL_DISCOVER_SOURCE, source);
 	
 	        

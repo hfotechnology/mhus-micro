@@ -11,4 +11,8 @@ public abstract class AbstractPublisher extends MLog implements MicroPublisher {
         this.api = api;
     }
 
+	public void doDestroy() {
+		
+	}
+
 }

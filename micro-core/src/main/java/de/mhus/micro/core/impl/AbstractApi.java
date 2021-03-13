@@ -3,15 +3,17 @@ package de.mhus.micro.core.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.operation.OperationDescription;
-import de.mhus.micro.core.api.C;
+import de.mhus.micro.core.api.Micro;
 import de.mhus.micro.core.api.MicroApi;
 import de.mhus.micro.core.api.MicroDiscovery;
 import de.mhus.micro.core.api.MicroProtocol;
@@ -51,6 +53,15 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
     	publishToAll(obj);
     }
     
+    public void removeProvider(MicroProvider obj) {
+    	discovery.remove(obj);
+    	providers.remove(obj);
+    	
+    	if (obj instanceof AbstractProvider)
+    		((AbstractProvider)obj).doDestroy();
+    }
+    
+    
     public void addDiscovery(MicroDiscovery obj) {
     	if (obj instanceof AbstractDiscovery)
     		((AbstractDiscovery)obj).doInit(this);
@@ -58,6 +69,13 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
     	
     }
 
+    public void removeDiscovery(MicroDiscovery obj) {
+    	discovery.remove(obj);
+    	if (obj instanceof AbstractDiscovery)
+    		((AbstractDiscovery)obj).doDestroy();
+    	
+    }
+    
 	public void addPublisher(MicroPublisher obj) {
     	if (obj instanceof AbstractPublisher)
     		((AbstractPublisher)obj).doInit(this);
@@ -65,15 +83,33 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
     	publishAll(obj);
     }
 	
+	public void removePublisher(MicroPublisher obj) {
+    	publishers.remove(obj);
+    	
+    	if (obj instanceof AbstractPublisher)
+    		((AbstractPublisher)obj).doDestroy();
+    }
+	
 	public void addProtocol(MicroProtocol obj) {
 		for (String proto : obj.getNames())
 			addProtocol(proto, obj);
 	}
 
+	public void removeProtocol(MicroProtocol obj) {
+		for (String proto : obj.getNames())
+			removeProtocol(proto);
+	}
+	
 	public void addProtocol(String name, MicroProtocol obj) {
 		protocols.put(name, obj);
 		if (obj instanceof AbstractProtocol)
 			((AbstractProtocol)obj).doInit(this);
+	}
+	
+	public void removeProtocol(String name) {
+		MicroProtocol obj = protocols.remove(name);
+		if (obj instanceof AbstractProtocol)
+			((AbstractProtocol)obj).doDestroy();
 	}
 	
     private void publishToAll(MicroProvider obj) {
@@ -113,7 +149,7 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 	}
 
 	private MicroProtocol getProtoExecutor(OperationDescription desc) {
-		String proto = desc.getLabels().getString(C.LABEL_PROTO, "");
+		String proto = desc.getLabels().getString(Micro.LABEL_PROTO, "");
 		MicroProtocol executor = protocols.get(proto);
 		if (executor == null)
 			throw new UnknownProtocolException(proto);
@@ -122,7 +158,7 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 
 	public boolean isLocal(OperationDescription desc) {
 		if (desc == null) return true;
-		return desc.getLabels().getBoolean(C.LABEL_LOCAL, false);
+		return desc.getLabels().getBoolean(Micro.LABEL_LOCAL, false);
 	}
 
 	public void check() {
@@ -137,5 +173,20 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 		return res;
 	}
 
+	public void forEachProvider(Consumer<MicroProvider> action) {
+		providers.forEach(action);
+	}
+
+	public void forEachProtocol(Consumer<MicroProtocol> action) {
+		new HashSet<MicroProtocol>(protocols.values()).forEach(action);
+	}
+
+	public void forEachDiscovery(Consumer<MicroDiscovery> action) {
+		discovery.forEach(action);
+	}
+
+	public void forEachPublisher(Consumer<MicroPublisher> action) {
+		publishers.forEach(action);
+	}
 
 }

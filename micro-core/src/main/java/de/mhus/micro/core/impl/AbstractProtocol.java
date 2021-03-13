@@ -10,5 +10,9 @@ public abstract class AbstractProtocol extends MLog implements MicroProtocol {
     public void doInit(AbstractApi api) {
         this.api = api;
     }
-    
+
+	public void doDestroy() {
+		
+	}
+
 }
