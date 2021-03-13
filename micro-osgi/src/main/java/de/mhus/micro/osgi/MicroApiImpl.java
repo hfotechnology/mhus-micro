@@ -57,7 +57,6 @@ public class MicroApiImpl implements MicroApiServiceProvider {
 	
 	private LocalOperationProtocol operProtocol;
 	private LocalOperationProvider operProvider;
-
 	
 	@Activate
 	public void doActivate(ComponentContext ctx) {
