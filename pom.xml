@@ -59,6 +59,7 @@
 	<modules>
         <module>micro-core</module>
         <module>micro-osgi</module>
+        <module>micro-karaf</module>
      </modules>
 
 </project>
