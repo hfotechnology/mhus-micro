@@ -17,11 +17,11 @@ import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.aaa.Aaa;
-import de.mhus.lib.core.config.IConfig;
-import de.mhus.lib.core.config.JsonConfigBuilder;
-import de.mhus.lib.core.config.MConfig;
 import de.mhus.lib.core.io.http.MHttp;
 import de.mhus.lib.core.io.http.MHttpClientBuilder;
+import de.mhus.lib.core.node.INode;
+import de.mhus.lib.core.node.JsonNodeBuilder;
+import de.mhus.lib.core.node.MNode;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.parser.StringCompiler;
 import de.mhus.micro.core.api.Micro;
@@ -34,7 +34,7 @@ public class RestProtocol extends AbstractProtocol {
 	private HttpClient client = new MHttpClientBuilder().getHttpClient();
 	
 	@Override
-	public MicroResult execute(OperationDescription desc, IConfig arguments, IReadProperties properties) {
+	public MicroResult execute(OperationDescription desc, INode arguments, IReadProperties properties) {
 
 		try {
 	        String uri = desc.getLabels().getString(Micro.REST_URL);
@@ -59,7 +59,7 @@ public class RestProtocol extends AbstractProtocol {
                         post.addHeader("Authorization", "Bearer " + jwt);
                 }
                 // TODO different transport types - xml, form properties - pluggable?
-                String argJson = IConfig.toPrettyJsonString(arguments);
+                String argJson = INode.toPrettyJsonString(arguments);
                 post.setEntity(new StringEntity(argJson, MString.CHARSET_UTF_8));
                 res = client.execute(post);
             } else
@@ -71,7 +71,7 @@ public class RestProtocol extends AbstractProtocol {
                         post.addHeader("Authorization", "Bearer " + jwt);
                 }
                 // TODO different transport types - xml, form properties - pluggable?
-                String argJson = IConfig.toPrettyJsonString(arguments);
+                String argJson = INode.toPrettyJsonString(arguments);
                 post.setEntity(new StringEntity(argJson, MString.CHARSET_UTF_8));
                 res = client.execute(post);
             } 
@@ -117,20 +117,20 @@ public class RestProtocol extends AbstractProtocol {
             	config.setString(header.getName(), header.getValue());
             }
 
-            IConfig resC = null;
+            INode resC = null;
             
             HttpEntity entry = res.getEntity();
             Header type = entry.getContentType();
             // TODO different return formats - xml, plain, stream - pluggable?
             if (type.getValue().startsWith(MHttp.CONTENT_TYPE_JSON)) {
                 InputStream is = entry.getContent();
-                resC = new JsonConfigBuilder().read(is);
+                resC = new JsonNodeBuilder().read(is);
             } else
             if (MHttp.CONTENT_TYPE_TEXT.equals(type.getValue())) {
                 InputStream is = entry.getContent();
                 String resText = MFile.readFile(is);
-                resC = new MConfig();
-                resC.setString(IConfig.NAMELESS_VALUE, resText);
+                resC = new MNode();
+                resC.setString(INode.NAMELESS_VALUE, resText);
             }
 
             return new MicroResult(successful, rc, msg, desc, resC, config);

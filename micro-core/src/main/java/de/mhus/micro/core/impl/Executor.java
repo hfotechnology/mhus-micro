@@ -7,8 +7,8 @@ import de.mhus.lib.core.MLog;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.aaa.Aaa;
 import de.mhus.lib.core.aaa.SubjectEnvironment;
-import de.mhus.lib.core.config.IConfig;
 import de.mhus.lib.core.logging.ITracer;
+import de.mhus.lib.core.node.INode;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.micro.core.api.MicroApi;
@@ -28,7 +28,7 @@ public class Executor extends MLog {
 			Format<TextMap> traceFormat, 
 			TextMap traceMapper, 
 			String pathVersion, 
-			IConfig arguments) {
+			INode arguments) {
 		
 		IProperties properties = new MProperties();
 		OperationDescription description = null;

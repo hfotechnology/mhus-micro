@@ -10,9 +10,9 @@ import java.util.function.Function;
 
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
-import de.mhus.lib.core.config.IConfig;
-import de.mhus.lib.core.config.IConfigFactory;
 import de.mhus.lib.core.definition.DefRoot;
+import de.mhus.lib.core.node.INode;
+import de.mhus.lib.core.node.INodeFactory;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.errors.MException;
@@ -26,7 +26,7 @@ public class ConfigProvider extends AbstractProvider {
 	private File file;
 	private long modifyDate;
 	
-	public ConfigProvider(IConfig config) {
+	public ConfigProvider(INode config) {
 		reload(config);
 	}
 	
@@ -56,16 +56,16 @@ public class ConfigProvider extends AbstractProvider {
 	}
 
 	private void reload(File file) throws MException {
-		IConfig config = M.l(IConfigFactory.class).read(file);
+		INode config = M.l(INodeFactory.class).read(file);
 		reload(config);
 		modifyDate = file.lastModified();
 	}
 
-	public synchronized void reload(IConfig config) {
+	public synchronized void reload(INode config) {
 		ArrayList<OperationDescription> l = new ArrayList<>();
 		Set<UUID> uuids = new HashSet<>();
 		
-		for (IConfig entry : config.getArrayOrCreate(IConfig.NAMELESS_VALUE)) {
+		for (INode entry : config.getArrayOrCreate(INode.NAMELESS_VALUE)) {
 			try {
 				UUID uuid = UUID.fromString( entry.getStringOrCreate(Micro.DATA_UUID, x -> UUID.randomUUID().toString()) );
 				String path = entry.getString(Micro.DATA_PATH);

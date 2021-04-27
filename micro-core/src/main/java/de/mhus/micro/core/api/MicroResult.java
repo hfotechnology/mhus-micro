@@ -1,7 +1,7 @@
 package de.mhus.micro.core.api;
 
 import de.mhus.lib.core.IReadProperties;
-import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.node.INode;
 import de.mhus.lib.core.operation.OperationDescription;
 
 public class MicroResult {
@@ -9,14 +9,14 @@ public class MicroResult {
     public static final int OK = 0;
     
     private OperationDescription description;
-    private IConfig result;
+    private INode result;
     private int rc;
     private String msg;
     private boolean transportSuccessful;
 	private Throwable error;
 	private IReadProperties properties;
 
-    public MicroResult(boolean transportSuccessful, int rc, String msg, OperationDescription description, IConfig result, IReadProperties properties) {
+    public MicroResult(boolean transportSuccessful, int rc, String msg, OperationDescription description, INode result, IReadProperties properties) {
         this.transportSuccessful = transportSuccessful;
         this.rc = rc;
         this.msg = msg;
@@ -36,7 +36,7 @@ public class MicroResult {
 	public OperationDescription getDescription() {
         return description;
     }
-    public IConfig getResult() {
+    public INode getResult() {
         return result;
     }
     public int getReturnCode() {

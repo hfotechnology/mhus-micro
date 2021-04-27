@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.mhus.lib.core.IReadProperties;
-import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.node.INode;
 import de.mhus.lib.core.operation.DefaultTaskContext;
 import de.mhus.lib.core.operation.Operation;
 import de.mhus.lib.core.operation.OperationDescription;
@@ -19,7 +19,7 @@ public class LocalOperationProtocol extends AbstractProtocol implements Operatio
 	private Map<String,Operation> operations = Collections.synchronizedMap(new HashMap<>());
 	
 	@Override
-	public MicroResult execute(OperationDescription desc, IConfig arguments, IReadProperties properties) {
+	public MicroResult execute(OperationDescription desc, INode arguments, IReadProperties properties) {
 
 		String key = desc.getPathVersion();
 		Operation oper = findOperation(key);

@@ -11,7 +11,7 @@ import org.apache.shiro.subject.Subject;
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.aaa.Aaa;
-import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.node.INode;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.errors.NotFoundException;
 import de.mhus.lib.jms.ClientJms;
@@ -30,7 +30,7 @@ public class JmsProtocol extends AbstractProtocol {
 	private JmsConnection con = null;
 	
 	@Override
-	public MicroResult execute(OperationDescription desc, IConfig arguments, IReadProperties properties) {
+	public MicroResult execute(OperationDescription desc, INode arguments, IReadProperties properties) {
 
 		try {
 	        String queue = desc.getLabels().getString("queue");
@@ -51,7 +51,7 @@ public class JmsProtocol extends AbstractProtocol {
 	                    if (jwt != null)
 	                        msg.setStringProperty("jwt_token", jwt);
 	                }
-	                String json = IConfig.toPrettyJsonString(arguments);
+	                String json = INode.toPrettyJsonString(arguments);
 	                msg.setText(json);
 	                Message res = client.sendJms(msg);
 	                
@@ -66,9 +66,9 @@ public class JmsProtocol extends AbstractProtocol {
 	                String mesg = res.getStringProperty("msg");
 	                boolean successful = res.getBooleanProperty("successful");
 	                
-	                IConfig result = null;
+	                INode result = null;
 	                if (res instanceof TextMessage) {
-	                    result = IConfig.readConfigFromString( ((TextMessage)res).getText() );
+	                    result = INode.readNodeFromString( ((TextMessage)res).getText() );
 	                } else
 	                if (res instanceof MapMessage) {
 	                    result = MJms.getMapConfig((MapMessage)res);

@@ -12,9 +12,9 @@ import java.util.function.Function;
 
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
-import de.mhus.lib.core.config.IConfig;
-import de.mhus.lib.core.config.IConfigFactory;
 import de.mhus.lib.core.definition.DefRoot;
+import de.mhus.lib.core.node.INode;
+import de.mhus.lib.core.node.INodeFactory;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Version;
 import de.mhus.lib.form.ModelUtil;
@@ -64,9 +64,9 @@ public class FsDiscovery extends AbstractDiscovery {
 	}
 
 	private void load(File file) {
-		IConfigFactory factory = M.l(IConfigFactory.class);
+		INodeFactory factory = M.l(INodeFactory.class);
 		try {
-			IConfig entry = factory.read(file);
+			INode entry = factory.read(file);
 			
 			UUID uuid = UUID.fromString( entry.getStringOrCreate(Micro.DATA_UUID, x -> UUID.randomUUID().toString()) );
 			String path = entry.getString(Micro.DATA_PATH);

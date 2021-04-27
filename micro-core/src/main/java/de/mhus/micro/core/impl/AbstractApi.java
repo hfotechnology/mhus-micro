@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.MLog;
-import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.node.INode;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.micro.core.api.Micro;
 import de.mhus.micro.core.api.MicroApi;
@@ -166,7 +166,7 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 	}
 
 	@Override
-	public MicroResult execute(OperationDescription desc, IConfig arguments, IReadProperties properties)
+	public MicroResult execute(OperationDescription desc, INode arguments, IReadProperties properties)
 			throws Exception {
 		MicroProtocol executor = getProtoExecutor(desc);
 		MicroResult res = executor.execute(desc, arguments, properties);

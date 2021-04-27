@@ -13,9 +13,9 @@ import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MFile;
 import de.mhus.lib.core.MJson;
-import de.mhus.lib.core.config.IConfig;
-import de.mhus.lib.core.config.JsonConfigBuilder;
 import de.mhus.lib.core.io.http.MHttp;
+import de.mhus.lib.core.node.INode;
+import de.mhus.lib.core.node.JsonNodeBuilder;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.errors.NotSupportedException;
 import de.mhus.micro.core.api.MicroApi;
@@ -50,7 +50,7 @@ public class OperationsNode extends AbstractNode {
     @Override
     public RestResult doRead(CallContext context) throws Exception {
         String load = context.getParameter("_load");
-        return doOperation(context, load == null ? IConfig.wrap(context.getParameters()) : IConfig.readConfigFromString(load));
+        return doOperation(context, load == null ? INode.wrap(context.getParameters()) : INode.readNodeFromString(load));
     }
 
     // POST
@@ -62,10 +62,10 @@ public class OperationsNode extends AbstractNode {
             load = context.getParameter("load");
         else
             load = MFile.readFile(loadStream);
-        return doOperation(context, IConfig.readConfigFromString(load));
+        return doOperation(context, INode.readNodeFromString(load));
     }
 
-    private RestResult doOperation(CallContext context, IConfig load) throws Exception {
+    private RestResult doOperation(CallContext context, INode load) throws Exception {
 
     	OperationDescription oper = findOperation(context);
         if (oper == null)
@@ -83,27 +83,27 @@ public class OperationsNode extends AbstractNode {
         context.setResponseHeader("rc", res.getReturnCode());
         context.setResponseHeader("msg", res.getMessage());
         
-        IConfig cfg = null;
+        INode cfg = null;
         
         if (r != null) {
             // map result to rest result
             if (r instanceof Map) {
-                cfg = IConfig.readFromMap((Map<?, ?>) r);
+                cfg = INode.readFromMap((Map<?, ?>) r);
             } else
-            if (r instanceof IConfig) {
-                cfg = (IConfig)r;
+            if (r instanceof INode) {
+                cfg = (INode)r;
             } else
             if (r instanceof ObjectNode) {
-                cfg = new JsonConfigBuilder().fromJson((JsonNode)r);
+                cfg = new JsonNodeBuilder().fromJson((JsonNode)r);
             } else
             if (r instanceof String) {
             	return new PlainTextResult((String)r, MHttp.CONTENT_TYPE_TEXT);
             } else {
                 JsonNode json = MJson.pojoToJson(r);
-                cfg = new JsonConfigBuilder().fromJson(json);
+                cfg = new JsonNodeBuilder().fromJson(json);
             }
 
-            JsonNode json = new JsonConfigBuilder().writeToJsonNode(cfg);
+            JsonNode json = new JsonNodeBuilder().writeToJsonNode(cfg);
             JsonResult out = new JsonResult();
             out.setJson(json);
             return out;

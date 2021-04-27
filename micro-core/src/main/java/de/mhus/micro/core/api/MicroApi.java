@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.IReadProperties;
-import de.mhus.lib.core.config.IConfig;
+import de.mhus.lib.core.node.INode;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Value;
 import de.mhus.lib.errors.NotFoundException;
@@ -24,7 +24,7 @@ public interface MicroApi {
      * @return list of results
      * @throws Exception 
      */
-    default List<MicroResult> executeAll(MicroFilter filter, IConfig arguments, IProperties properties) throws Exception {
+    default List<MicroResult> executeAll(MicroFilter filter, INode arguments, IProperties properties) throws Exception {
     	List<MicroResult> out = new ArrayList<>();
     	discover(filter, desc -> {
     		try {
@@ -46,9 +46,9 @@ public interface MicroApi {
      * @return
      * @throws Exception
      */
-    MicroResult execute(OperationDescription description, IConfig arguments, IReadProperties properties) throws Exception;
+    MicroResult execute(OperationDescription description, INode arguments, IReadProperties properties) throws Exception;
     
-    default MicroResult execute(String pathVersion, IConfig arguments, IReadProperties properties) throws Exception {
+    default MicroResult execute(String pathVersion, INode arguments, IReadProperties properties) throws Exception {
     	OperationDescription description = first(new FilterPathVersion(pathVersion));
     	if (description == null) throw new NotFoundException("@Operation for path $1 not found",pathVersion);
     	return execute(description, arguments, properties);
