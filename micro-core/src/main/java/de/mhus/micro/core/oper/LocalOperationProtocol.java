@@ -29,7 +29,7 @@ public class LocalOperationProtocol extends AbstractProtocol implements Operatio
 
 		try {
 			OperationResult res = oper.doExecute(context);
-			return new MicroResult(res.isSuccessful(), res.getReturnCode(), res.getMsg(), desc, res.getResultAsConfig(), properties);
+			return new MicroResult(res.isSuccessful(), res.getReturnCode(), res.getMsg(), desc, res.getResultAsNode(), properties);
 		} catch (Throwable e) {
 			log().d(desc,e);
 			return new MicroResult(desc, e);
