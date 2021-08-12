@@ -28,9 +28,9 @@
 	<artifactId>mhus-micro</artifactId>
 	<version>7.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>mhus-rest</name>
+	<name>mhus-micro</name>
 	<description>Framework to work with micro services</description>
-	<url>http://www.mhus.de</url>
+	<url>http://www.mhus.info</url>
 
     <inceptionYear>2020</inceptionYear>
 	<licenses>
@@ -42,8 +42,8 @@
 	</licenses>
 	
 	<scm>
-		<url>https://github.com/mhus/mhus-micro</url>
-		<connection>scm:git:https://github.com/mhus/mhus-micro/</connection>
+		<url>https://github.com/mhus-info/mhus-micro</url>
+		<connection>scm:git:https://github.com/mhus-info/mhus-micro/</connection>
 	</scm>
 	
 	<developers>
