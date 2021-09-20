@@ -15,6 +15,7 @@ import de.mhus.micro.core.api.MicroApi;
 import de.mhus.micro.core.api.MicroResult;
 import de.mhus.micro.core.filter.FilterPathVersion;
 import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.propagation.Format;
 import io.opentracing.propagation.TextMap;
@@ -43,12 +44,12 @@ public class Executor extends MLog {
 			if (parentSpanCtx == null) {
                 scope = ITracer.get().start("execute", pathVersion);
             } else if (parentSpanCtx != null) {
-                scope =
-                        ITracer.get()
-                                .tracer()
-                                .buildSpan("execute")
-                                .asChildOf(parentSpanCtx)
-                                .startActive(true);
+                Span span = ITracer.get()
+                        .tracer()
+                        .buildSpan("execute")
+                        .asChildOf(parentSpanCtx)
+                        .start();
+                scope = ITracer.get().tracer().scopeManager().activate(span);
                 ITracer.get().activate(pathVersion);
             }
 			
