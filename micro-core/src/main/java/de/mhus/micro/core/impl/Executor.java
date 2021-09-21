@@ -49,7 +49,7 @@ public class Executor extends MLog {
                         .buildSpan("execute")
                         .asChildOf(parentSpanCtx)
                         .start();
-                scope = ITracer.get().tracer().scopeManager().activate(span);
+                scope = ITracer.get().activate(span);
                 ITracer.get().activate(pathVersion);
             }
 			
