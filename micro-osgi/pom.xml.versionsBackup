@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2018 Mike Hummel (mh@mhus.de)
+    Copyright (C) 2020 Mike Hummel (mh@mhus.de)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>micro-karaf</artifactId>
+	<artifactId>micro-osgi</artifactId>
 	<packaging>bundle</packaging>
-	<description>Karaf Commands for Micro</description>
     <parent>
         <artifactId>mhus-micro</artifactId>
         <groupId>de.mhus.micro</groupId>
-        <version>7.0.0</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
 	<build>
@@ -38,68 +37,41 @@
 					<instructions>
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<Export-Package>de.mhus.micro.karaf.*;version=${project.version}</Export-Package>
+						<Export-Package>
+							de.mhus.micro.osgi.*;version=${project.version},
+						</Export-Package>
 						<Import-Package>
-							*
+                          redis.clients.jedis.*;resolution:=optional
+						  *
 						</Import-Package>
-						<Service-Component>*</Service-Component>
-                        <DynamicImport-Package>*</DynamicImport-Package>
+						<DynamicImport-Package>*</DynamicImport-Package>
+						<Service-Component>de.mhus.micro.osgi.*</Service-Component>
 					</instructions>
 				</configuration>
 			</plugin>
-                <plugin>
-                    <groupId>de.mhus.apache.karaf.tooling</groupId>
-                    <artifactId>karaf-services-maven-plugin</artifactId>
-                </plugin>
-		</plugins>
+			
+        </plugins>
+	
 	</build>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
+			<groupId>de.mhus.lib</groupId>
+			<artifactId>lib-annotations</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>osgi.cmpn</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.karaf.shell</groupId>
-			<artifactId>org.apache.karaf.shell.console</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.karaf.log</groupId>
-			<artifactId>org.apache.karaf.log.core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.karaf.bundle</groupId>
-			<artifactId>org.apache.karaf.bundle.core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.karaf.jaas</groupId>
-			<artifactId>org.apache.karaf.jaas.config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.karaf.jaas</groupId>
-			<artifactId>org.apache.karaf.jaas.modules</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.ops4j.pax.url</groupId>
-			<artifactId>pax-url-aether</artifactId>
-		</dependency>
-		<dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
-            <artifactId>pax-logging-log4j2</artifactId>
-        </dependency>
-		
-        <dependency>
-            <groupId>de.mhus.lib</groupId>
-            <artifactId>lib-annotations</artifactId>
-        </dependency>
 		<dependency>
 			<groupId>de.mhus.lib</groupId>
 			<artifactId>lib-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.cmpn</artifactId>
+        </dependency>
+		
         <dependency>
             <groupId>de.mhus.micro</groupId>
             <artifactId>micro-core</artifactId>
@@ -108,6 +80,7 @@
             <groupId>de.mhus.osgi</groupId>
             <artifactId>osgi-api</artifactId>
         </dependency>
-				
+                
 	</dependencies>
+
 </project>

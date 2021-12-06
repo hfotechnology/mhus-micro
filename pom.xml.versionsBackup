@@ -26,7 +26,7 @@
     </parent>
 	<groupId>de.mhus.micro</groupId>
 	<artifactId>mhus-micro</artifactId>
-	<version>7.0.0</version>
+	<version>7.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>mhus-micro</name>
 	<description>Framework to work with micro services</description>
