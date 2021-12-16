@@ -2,6 +2,7 @@ package de.mhus.micro.core.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +24,14 @@ import de.mhus.micro.core.api.MicroResult;
 
 public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 
-	private List<MicroDiscovery> discovery = Collections.synchronizedList(new ArrayList<>());
+	protected static final Comparator<MicroDiscovery> DEFAULT_DISCOVERY_ORDER = new Comparator<MicroDiscovery>() {
+
+        @Override
+        public int compare(MicroDiscovery o1, MicroDiscovery o2) {
+            return Integer.compare(o1.getPriority(),o2.getPriority());
+        }
+    };
+    private List<MicroDiscovery> discovery = Collections.synchronizedList(new ArrayList<>());
 	private List<MicroPublisher> publishers = Collections.synchronizedList(new ArrayList<>());
 	private List<MicroProvider> providers = Collections.synchronizedList(new ArrayList<>());
 	private Map<String, MicroProtocol> protocols = Collections.synchronizedMap(new HashMap<>());
@@ -49,7 +57,7 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
     		((AbstractProvider)obj).doInit(this);
     	discovery.add(obj);
     	providers.add(obj);
-    	
+    	orderDiscovery();
     	publishToAll(obj);
     }
     
@@ -66,7 +74,11 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
     	if (obj instanceof AbstractDiscovery)
     		((AbstractDiscovery)obj).doInit(this);
     	discovery.add(obj);
-    	
+        orderDiscovery();
+    }
+
+    protected void orderDiscovery() {
+        discovery.sort(DEFAULT_DISCOVERY_ORDER);
     }
 
     public void removeDiscovery(MicroDiscovery obj) {

@@ -1,9 +1,12 @@
 package de.mhus.micro.core.fs;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -11,7 +14,9 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MProperties;
+import de.mhus.lib.core.cfg.CfgString;
 import de.mhus.lib.core.definition.DefRoot;
 import de.mhus.lib.core.node.INode;
 import de.mhus.lib.core.node.INodeFactory;
@@ -24,6 +29,7 @@ import de.mhus.micro.core.impl.AbstractDiscovery;
 public class FsDiscovery extends AbstractDiscovery {
 
     private volatile Map<String,OperationDescription> descriptions = Collections.synchronizedMap(new HashMap<>());
+    private volatile List<OperationDescription> values = Collections.synchronizedList(new ArrayList<>());
     private volatile Map<String,Long> modifyDates = Collections.synchronizedMap(new HashMap<>());
 	private File dir;
 
@@ -49,7 +55,9 @@ public class FsDiscovery extends AbstractDiscovery {
 		
 		done.forEach( v -> {
 			modifyDates.remove(v);
-			descriptions.remove(v);
+			OperationDescription x = descriptions.remove(v);
+			if (x != null)
+			    values.remove(x);
 		});
 		
 	}
@@ -61,9 +69,15 @@ public class FsDiscovery extends AbstractDiscovery {
 			if (file.isFile())
 				load(file);
 		descriptions.values().removeIf(v -> v.getLabels().containsKey(Micro.LABEL_DEPRECATED));
+		values.removeIf(v -> v.getLabels().containsKey(Micro.LABEL_DEPRECATED));
+		orderValues();
 	}
 
-	private void load(File file) {
+	private void orderValues() {
+        values.sort(Micro.DESCRIPTION_COMPERATOR);
+    }
+
+    private void load(File file) {
 		INodeFactory factory = M.l(INodeFactory.class);
 		try {
 			INode entry = factory.read(file);
@@ -97,6 +111,7 @@ public class FsDiscovery extends AbstractDiscovery {
 			OperationDescription desc = new OperationDescription(uuid, path, version, null, title, labels, form );
 			
 			descriptions.put(file.getName(),desc);
+			values.add(desc);
 			
 		} catch (Exception e) {
 			log().e(file,e);

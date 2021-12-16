@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.IReadProperties;
+import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.node.INode;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.Value;
@@ -43,7 +44,7 @@ public interface MicroApi {
      * @param description
      * @param arguments
      * @param properties
-     * @return
+     * @return The result
      * @throws Exception
      */
     MicroResult execute(OperationDescription description, INode arguments, IReadProperties properties) throws Exception;
@@ -52,6 +53,15 @@ public interface MicroApi {
     	OperationDescription description = first(new FilterPathVersion(pathVersion));
     	if (description == null) throw new NotFoundException("@Operation for path $1 not found",pathVersion);
     	return execute(description, arguments, properties);
+    }
+    
+    default MicroResult execute2(String pathVersion, INode arguments, Object ... propertiesKV) throws Exception {
+        OperationDescription description = first(new FilterPathVersion(pathVersion));
+        if (description == null) throw new NotFoundException("@Operation for path $1 not found",pathVersion);
+        MProperties properties = null;
+        if (propertiesKV != null)
+            properties = IProperties.to(propertiesKV);
+        return execute(description, arguments, properties);
     }
     
     default OperationDescription first(MicroFilter filter) {
@@ -82,6 +92,7 @@ public interface MicroApi {
     
     /**
      * Return all known operation descriptions.
+     * @param action 
      * 
      * @param filter
      * @param results

@@ -24,7 +24,16 @@ public interface MicroDiscovery {
     /**
      * Call action for each known operation.
      * @param action
+     * @return true...
      */
 	Boolean discover(Function<OperationDescription,Boolean> action);
+
+	/**
+	 * Set the priority of the discovery provider to prefer protocols
+	 * @return
+	 */
+    default int getPriority() {
+        return 100;
+    }
     
 }

@@ -41,8 +41,7 @@
 							de.mhus.micro.osgi.*;version=${project.version},
 						</Export-Package>
 						<Import-Package>
-                          redis.clients.jedis.*;resolution:=optional
-						  *
+						  *;resolution:=optional
 						</Import-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
 						<Service-Component>de.mhus.micro.osgi.*</Service-Component>
@@ -81,6 +80,19 @@
             <artifactId>osgi-api</artifactId>
         </dependency>
                 
+        <dependency>
+            <groupId>de.mhus.micro</groupId>
+            <artifactId>micro-jms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.mhus.jms</groupId>
+            <artifactId>jms-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.mhus.jms</groupId>
+            <artifactId>jms-osgi-api</artifactId>
+        </dependency>
+        
 	</dependencies>
 
 </project>

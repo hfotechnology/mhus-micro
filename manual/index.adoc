@@ -38,6 +38,9 @@ The framework is as open as possible to allow dynamic extension of the features.
 * locally provided procedures should not be published but can be called locally - It's a special case.
 * A procedure can be published in more then one way e.g. locally or the same vm, via rest and via JMS. There must be an 
 order to use the 'best' way to call a procedure.
+* A procedure could be provided in replicas. In this case two situations can happen. The transport layer has an implemented 
+way to deal with load balancing, readiness checks etc. Or the procedure appears multiple times in the discovery with different 
+targets. In this case the library itself need to load balance the requests.
 
 === Discovery Methods
 

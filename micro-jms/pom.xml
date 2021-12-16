@@ -19,9 +19,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>micro-core</artifactId>
+	<artifactId>micro-jms</artifactId>
 	<packaging>bundle</packaging>
-	<description>Micro Service OSGi API</description>
+	<description>Micro Service OSGi API extension for jms</description>
 	<parent>
 		<artifactId>mhus-micro</artifactId>
 		<groupId>de.mhus.micro</groupId>
@@ -39,7 +39,7 @@
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Export-Package>
-							de.mhus.micro.core.*;version=${project.version}
+							de.mhus.micro.jms.*;version=${project.version}
 						</Export-Package>
 						<Import-Package>
                             *;resolution:=optional
@@ -58,6 +58,10 @@
 			<artifactId>lib-core</artifactId>
 		</dependency>
         <dependency>
+            <groupId>de.mhus.jms</groupId>
+            <artifactId>jms-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>de.mhus.rest</groupId>
             <artifactId>rest-core</artifactId>
         </dependency>
@@ -65,24 +69,11 @@
             <groupId>de.mhus.lib</groupId>
             <artifactId>lib-junit</artifactId>
         </dependency>
-		
         <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>3.5.1</version>
-        </dependency>  
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-            <version>2.0</version>
-        </dependency>     
+            <groupId>de.mhus.micro</groupId>
+            <artifactId>micro-core</artifactId>
+        </dependency>
 		
-		<dependency>
-		    <groupId>com.github.microwww</groupId>
-		    <artifactId>redis-server</artifactId>
-		    <version>0.1.0-3.0</version>
-		    <scope>test</scope>
-		</dependency>
 		
 	</dependencies>
 </project>
