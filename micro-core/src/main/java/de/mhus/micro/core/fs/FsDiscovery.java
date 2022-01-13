@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MCollection;
 import de.mhus.lib.core.MProperties;
@@ -120,7 +121,7 @@ public class FsDiscovery extends AbstractDiscovery {
 	}
 
 	@Override
-	public Boolean discover(Function<OperationDescription,Boolean> action) {
+	public Boolean discover(Function<OperationDescription,Boolean> action, Function<OperationDescription, Boolean> filter, IReadProperties properties) {
 		for ( OperationDescription desc : descriptions.values())
 			if (!action.apply(desc) )
 				return Boolean.FALSE;

@@ -4,9 +4,13 @@ import java.util.Map.Entry;
 
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
+import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.M;
+import de.mhus.lib.core.node.INode;
+import de.mhus.lib.core.node.MNode;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.micro.core.filter.FilterPathVersion;
 import de.mhus.micro.core.impl.services.MicroApiServiceProvider;
@@ -27,6 +31,15 @@ public class CmdDescriptionInfo extends AbstractCmd {
             multiValued = false)
     String name;
 
+    @Option(
+            name = "-c",
+            aliases = "--config",
+            description = "Config parameters",
+            required = false,
+            multiValued = true
+            )
+    private String[] config;
+    
 	@Override
 	public Object execute2() throws Exception {
 		
@@ -35,7 +48,13 @@ public class CmdDescriptionInfo extends AbstractCmd {
 			System.out.println("MicroApiServiceProvider not found");
 			return null;
 		}
-		OperationDescription desc = api.getApi().first(new FilterPathVersion(name));
+        INode cfg = null;
+        if (config != null) {
+            cfg = new MNode();
+            cfg.putAll( IProperties.explodeToMProperties(config) );
+        }
+        
+		OperationDescription desc = api.getApi().first(new FilterPathVersion(name), cfg);
 		if (desc == null) {
 			System.out.println("Description not found");
 			return null;

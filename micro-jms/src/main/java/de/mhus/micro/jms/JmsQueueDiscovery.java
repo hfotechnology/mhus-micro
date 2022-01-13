@@ -5,12 +5,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.operation.OperationDescription;
+import de.mhus.lib.core.util.Version;
 import de.mhus.lib.jms.JmsApi;
 import de.mhus.lib.jms.JmsConnection;
 import de.mhus.micro.core.api.Micro;
+import de.mhus.micro.core.filter.IPathFilter;
 import de.mhus.micro.core.impl.AbstractDiscovery;
 
 public class JmsQueueDiscovery extends AbstractDiscovery {
@@ -34,7 +37,7 @@ public class JmsQueueDiscovery extends AbstractDiscovery {
             try {
                 List<OperationDescription> list = MicroJmsUtil.doGetOperationList(con, queueName);
                 for (OperationDescription item : list) {
-                    list.add(item);
+                    newDescriptions.add(item);
                 }
             } catch (Exception e) {
                 log().d(queue,e);
@@ -49,7 +52,18 @@ public class JmsQueueDiscovery extends AbstractDiscovery {
     }
 
     @Override
-    public Boolean discover(Function<OperationDescription, Boolean> action) {
+    public Boolean discover(Function<OperationDescription, Boolean> action, Function<OperationDescription, Boolean> filter, IReadProperties properties) {
+        // Legacy support
+        if (filter != null && filter instanceof IPathFilter && properties != null) {
+            String queue = properties.getString(Micro.QUEUE, null);
+            String path = ((IPathFilter)filter).getPath();
+            if (queue != null && path != null) {
+                OperationDescription desc = MicroJmsUtil.newOperationDescription(null, path, queue, Version.V_0_0_0, path);
+                if (action.apply(desc) )
+                    return Boolean.TRUE;
+                return Boolean.FALSE;
+            }
+        }
         for ( OperationDescription desc : descriptions)
             if (!action.apply(desc) )
                 return Boolean.FALSE;

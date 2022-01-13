@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.definition.DefRoot;
@@ -108,7 +109,7 @@ public class ConfigProvider extends AbstractProvider {
 	}
 	
 	@Override
-	public Boolean discover(Function<OperationDescription,Boolean> action) {
+	public Boolean discover(Function<OperationDescription,Boolean> action, Function<OperationDescription, Boolean> filter, IReadProperties properties) {
 		for ( OperationDescription desc : list)
 			if (!action.apply(desc) )
 				return Boolean.FALSE;

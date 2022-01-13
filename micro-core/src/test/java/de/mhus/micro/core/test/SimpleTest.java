@@ -39,7 +39,7 @@ public class SimpleTest extends TestCase {
 			
 			cnt.value++;
 			return Boolean.TRUE;
-		} );
+		}, null, null );
 		
 		assertEquals(3, cnt.value);
 		

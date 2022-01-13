@@ -54,7 +54,7 @@ public class Executor extends MLog {
             }
 			
 			// execute
-	    	description = api.first(new FilterPathVersion(pathVersion));
+	    	description = api.first(new FilterPathVersion(pathVersion), properties);
 	    	if (description == null) throw new NotFoundException("@Operation for path $1 not found",pathVersion);
 	    	return api.execute(description, arguments, properties);
 			

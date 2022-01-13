@@ -14,6 +14,7 @@ import de.mhus.lib.core.MPeriod;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.MString;
 import de.mhus.lib.core.node.INode;
+import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.lib.jms.JmsConnection;
 import de.mhus.micro.jms.MicroJmsUtil;
@@ -60,9 +61,9 @@ public class OperationRemoteCmd extends AbstractCmd {
 		
 		if (cmd.equals("list")) {
 			if (MString.isSet(path)) queueName = path;
-			List<String> list = MicroJmsUtil.doGetOperationList(con, queueName);
+			List<OperationDescription> list = MicroJmsUtil.doGetOperationList(con, queueName);
 			if (list != null) {
-				for (String item : list)
+				for (OperationDescription item : list)
 					System.out.println(item);
 				System.out.println("OK");
 			} else {

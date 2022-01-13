@@ -70,7 +70,14 @@ public class CmdDescriptionExecute extends AbstractCmd {
 			System.out.println("MicroApiServiceProvider not found");
 			return null;
 		}
-		OperationDescription desc = api.getApi().first(new FilterPathVersion(name));
+
+        INode cfg = null;
+        if (config != null) {
+            cfg = new MNode();
+            cfg.putAll( IProperties.explodeToMProperties(config) );
+        }
+
+		OperationDescription desc = api.getApi().first(new FilterPathVersion(name), cfg);
 		if (desc == null) {
 			System.out.println("OperationDescription not found");
 			return null;
@@ -82,12 +89,6 @@ public class CmdDescriptionExecute extends AbstractCmd {
 		} else {
 			param = new MNode();
 			param.putAll( IProperties.explodeToMProperties(parameters) );
-		}
-		
-		INode cfg = null;
-		if (config != null) {
-			cfg = new MNode();
-			cfg.putAll( IProperties.explodeToMProperties(config) );
 		}
 		
 		DefaultTaskContext context = new DefaultTaskContext(this.getClass());

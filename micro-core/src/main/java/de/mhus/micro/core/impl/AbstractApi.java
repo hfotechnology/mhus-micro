@@ -134,7 +134,7 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 		    	        	log().e(desc,p,t);
 		    	        } } );
 		    		return Boolean.TRUE;
-    			} );
+    			}, null, null );
 	}
 
 	private void publishAll(MicroPublisher obj) {
@@ -143,11 +143,11 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 					if (!isLocal(desc))
 						obj.push(desc);
 					return Boolean.TRUE;
-				} ));
+				}, null, null ));
 	}
 
 	@Override
-	public void discover(Function<OperationDescription,Boolean> action) {
+	public void discover(Function<OperationDescription,Boolean> action, IReadProperties properties) {
 		for (MicroDiscovery d : discovery) {
 			if (!d.discover(desc -> {
 				try {
@@ -156,7 +156,7 @@ public /*abstract*/ class AbstractApi extends MLog implements MicroApi {
 					log().e(desc,t);
 				}
 				return Boolean.TRUE;
-			})) return;
+			}, action, properties)) return;
 		}
 	}
 

@@ -24,11 +24,7 @@ public class JmsProtocol extends AbstractProtocol {
 		    if (con == null) 
 		        throw new NotFoundException("jms connection not set");
 		    
-	        String queue = null;
-	        if (properties != null)
-	            queue = properties.getString(MicroJmsUtil.QUEUE, null);
-	        if (queue == null)
-	            queue = desc.getLabels().getString(MicroJmsUtil.QUEUE);
+	        String queue = desc.getLabels().getString(MicroJmsUtil.LABEL_QUEUE, null);
 	        long timeout = MicroJmsUtil.CFG_DEFAULT_JMS_TIMEOUT.value();
 	        if (properties != null)
 	            timeout = properties.getLong(MicroJmsUtil.TIMEOUT, timeout);

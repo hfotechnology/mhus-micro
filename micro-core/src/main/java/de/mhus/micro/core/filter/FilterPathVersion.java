@@ -4,7 +4,7 @@ import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.util.VersionRange;
 import de.mhus.micro.core.api.MicroFilter;
 
-public class FilterPathVersion implements MicroFilter {
+public class FilterPathVersion implements MicroFilter, IPathFilter {
 
 	private String path;
 	private VersionRange version;
@@ -37,5 +37,15 @@ public class FilterPathVersion implements MicroFilter {
 				return true;
 		return false;
 	}
+
+    @Override
+    public String getPath() {
+        return path;
+    }
+
+    @Override
+    public String getVersionRange() {
+        return version == null ? "" : version.toString();
+    }
 
 }

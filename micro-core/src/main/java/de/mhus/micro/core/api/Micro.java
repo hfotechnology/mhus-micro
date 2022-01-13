@@ -28,9 +28,14 @@ public class Micro {
 	public static final String REST_URL = "@url";
 	public static final String REST_METHOD = "@method";
 	public static final String PROTO_REST = "rest";
+    public static final String PROTO_JMS = "jms";
 	public static final String REST_HOST = "@host";
     public static final String NEED_ANSWER = "needAnswer";
-	
+    /**
+     * JMS QUEUE PROPERTY for legacy support - NOT LABEL, label will be \@queue
+     */
+    public static final String QUEUE =  "queue";
+
 	public static String getUniqueId(OperationDescription desc) {
 		return desc.getPath() + "-" + desc.getUuid() + "-" + desc.getLabels().getString(Micro.LABEL_PROTO, "");
 	}

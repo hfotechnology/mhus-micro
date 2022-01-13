@@ -66,7 +66,8 @@ public class MicroApiImpl implements MicroApiServiceProvider {
 		protocolTracker.start(ctx);
 		
 		operProtocol = new LocalOperationProtocol() {
-			protected Operation findOperation(String key) {
+			@Override
+            protected Operation findOperation(String key) {
 				return M.l(OperationManager.class).getOperation(key);
 			}
 		};

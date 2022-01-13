@@ -2,6 +2,7 @@ package de.mhus.micro.core.api;
 
 import java.util.function.Function;
 
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.operation.OperationDescription;
 
 /**
@@ -24,13 +25,15 @@ public interface MicroDiscovery {
     /**
      * Call action for each known operation.
      * @param action
-     * @return true...
+     * @param filter 
+     * @param properties 
+     * @return True if found something
      */
-	Boolean discover(Function<OperationDescription,Boolean> action);
+	Boolean discover(Function<OperationDescription,Boolean> action, Function<OperationDescription, Boolean> filter, IReadProperties properties);
 
 	/**
 	 * Set the priority of the discovery provider to prefer protocols
-	 * @return
+	 * @return current priority
 	 */
     default int getPriority() {
         return 100;

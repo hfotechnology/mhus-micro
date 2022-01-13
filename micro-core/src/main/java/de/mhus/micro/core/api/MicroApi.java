@@ -34,7 +34,7 @@ public interface MicroApi {
     			out.add(new MicroResult(desc, t));
     		}
     		return Boolean.TRUE;
-    	} );
+    	}, properties );
     	return out;
     }
     
@@ -44,27 +44,27 @@ public interface MicroApi {
      * @param description
      * @param arguments
      * @param properties
-     * @return The result
      * @throws Exception
+     * @return The result
      */
     MicroResult execute(OperationDescription description, INode arguments, IReadProperties properties) throws Exception;
     
     default MicroResult execute(String pathVersion, INode arguments, IReadProperties properties) throws Exception {
-    	OperationDescription description = first(new FilterPathVersion(pathVersion));
+    	OperationDescription description = first(new FilterPathVersion(pathVersion), properties);
     	if (description == null) throw new NotFoundException("@Operation for path $1 not found",pathVersion);
     	return execute(description, arguments, properties);
     }
     
     default MicroResult execute2(String pathVersion, INode arguments, Object ... propertiesKV) throws Exception {
-        OperationDescription description = first(new FilterPathVersion(pathVersion));
-        if (description == null) throw new NotFoundException("@Operation for path $1 not found",pathVersion);
         MProperties properties = null;
         if (propertiesKV != null)
             properties = IProperties.to(propertiesKV);
+        OperationDescription description = first(new FilterPathVersion(pathVersion), properties);
+        if (description == null) throw new NotFoundException("@Operation for path $1 not found",pathVersion);
         return execute(description, arguments, properties);
     }
     
-    default OperationDescription first(MicroFilter filter) {
+    default OperationDescription first(MicroFilter filter, IReadProperties properties) {
     	Value<OperationDescription> first = new Value<>();
     	discover(desc -> {
     		if (filter.matches(desc)) {
@@ -72,7 +72,7 @@ public interface MicroApi {
     			return Boolean.FALSE;
     		}
     		return Boolean.TRUE;
-    	});
+    	}, properties);
     	return first.value;
     }
     
@@ -81,22 +81,23 @@ public interface MicroApi {
      * 
      * @param filter
      * @param action
+     * @param properties 
      */
-    default void discover(MicroFilter filter, Function<OperationDescription,Boolean> action) {
+    default void discover(MicroFilter filter, Function<OperationDescription,Boolean> action, IReadProperties properties) {
     	discover(desc -> {
     		if (filter.matches(desc))
     			return action.apply(desc);
     		return Boolean.TRUE;
-    	});
+    	}, properties);
     }
     
     /**
      * Return all known operation descriptions.
      * @param action 
-     * 
+     * @param properties 
      * @param filter
      * @param results
      */
-    void discover(Function<OperationDescription,Boolean> action);
+    void discover(Function<OperationDescription,Boolean> action, IReadProperties properties);
 
 }

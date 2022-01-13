@@ -5,10 +5,13 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
+import de.mhus.lib.core.IProperties;
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.M;
 import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.console.ConsoleTable;
+import de.mhus.lib.core.node.INode;
+import de.mhus.lib.core.node.MNode;
 import de.mhus.micro.core.api.MicroFilter;
 import de.mhus.micro.core.filter.FilterLike;
 import de.mhus.micro.core.impl.services.MicroApiServiceProvider;
@@ -36,6 +39,15 @@ public class CmdDescriptionList extends AbstractCmd {
             required = false)
     private boolean full;
 
+    @Option(
+            name = "-c",
+            aliases = "--config",
+            description = "Config parameters",
+            required = false,
+            multiValued = true
+            )
+    private String[] config;
+
 	@Override
 	public Object execute2() throws Exception {
 		MicroApiServiceProvider api = M.l(MicroApiServiceProvider.class);
@@ -49,6 +61,12 @@ public class CmdDescriptionList extends AbstractCmd {
 			filter = new FilterLike(rules);
 		}
 		
+        INode cfg = null;
+        if (config != null) {
+            cfg = new MNode();
+            cfg.putAll( IProperties.explodeToMProperties(config) );
+        }
+        
 		ConsoleTable out = new ConsoleTable(tblOpt);
 		out.setHeaderValues("PathVersion","Caption","Labels", "Uuid");
 		api.getApi().discover(filter, desc ->
@@ -59,7 +77,7 @@ public class CmdDescriptionList extends AbstractCmd {
 								reduceLabels(desc.getLabels()),
 								desc.getUuid());
 						return Boolean.TRUE;
-					}
+					}, cfg
 				);
 
 		out.print();

@@ -26,6 +26,7 @@ import de.mhus.lib.errors.NotSupportedException;
 import de.mhus.lib.jms.ClientJms;
 import de.mhus.lib.jms.JmsConnection;
 import de.mhus.lib.jms.MJms;
+import de.mhus.micro.core.api.Micro;
 
 
 public class MicroJmsUtil {
@@ -45,11 +46,11 @@ public class MicroJmsUtil {
 
     public static final String FORCE_MAP_MESSAGE = "forceMapMessage";
 
-    public static final String QUEUE = "queue";
-
     public static final String TIMEOUT = "timeout";
 
     private static final String PARAM_OPERATION_VERSION = "version";
+
+    public static final String LABEL_QUEUE = "@queue";
 
     /**
      * Execute an operation via JMS.
@@ -180,12 +181,12 @@ public class MicroJmsUtil {
                 if (item.contains("|")) {
                     String[] parts = item.split("\\|");
                     try {
-                        desc = new OperationDescription(UUID.fromString(parts[0]), parts[1], new Version(parts[2]), null, parts[3]);
+                        desc = newOperationDescription(UUID.fromString(parts[0]), parts[1], queueName, new Version(parts[2]), parts[3]);
                     } catch (Throwable t) {
                         log.d(queueName,item,t);
                     }
                 } else {
-                    desc = new OperationDescription(UUID.randomUUID(),item,Version.V_0_0_0, null, item);
+                    desc = newOperationDescription(UUID.randomUUID(),item, queueName, Version.V_0_0_0, item);
                 }
                 if (desc != null)
                     out.add(desc);
@@ -193,6 +194,14 @@ public class MicroJmsUtil {
             return out;
         }
         return null;
+    }
+
+    public static OperationDescription newOperationDescription(UUID uuid, String path, String queue, Version version,
+            String title) {
+        OperationDescription desc = new OperationDescription(uuid, path, version, null, title);
+        ((MProperties)desc.getLabels()).setString(Micro.LABEL_PROTO, Micro.PROTO_JMS);
+        ((MProperties)desc.getLabels()).setString(LABEL_QUEUE, queue);
+        return desc;
     }
 
 }

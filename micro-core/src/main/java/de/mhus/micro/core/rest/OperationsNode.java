@@ -116,7 +116,7 @@ public class OperationsNode extends AbstractNode {
         String path = (String) context.get("path");
 
         MicroApi api = M.l(MicroApi.class);
-        return api.first(new FilterPathVersion(path));
+        return api.first(new FilterPathVersion(path), null);
     }
 
     @Override

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.operation.Operation;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.micro.core.impl.AbstractProvider;
@@ -24,7 +25,7 @@ public abstract class OperationProvider extends AbstractProvider implements Oper
 	}
 
 	@Override
-	public Boolean discover(Function<OperationDescription, Boolean> action) {
+	public Boolean discover(Function<OperationDescription, Boolean> action, Function<OperationDescription, Boolean> filter, IReadProperties properties) {
 		for ( OperationDescription desc : descriptions.values())
 			if (!action.apply(desc) )
 				return Boolean.FALSE;

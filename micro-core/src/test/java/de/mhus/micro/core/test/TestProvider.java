@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
+import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.micro.core.impl.AbstractProvider;
 
@@ -22,7 +23,7 @@ public class TestProvider extends AbstractProvider {
 	}
 
 	@Override
-	public Boolean discover(Function<OperationDescription,Boolean> action) {
+	public Boolean discover(Function<OperationDescription,Boolean> action, Function<OperationDescription, Boolean> filter, IReadProperties properties) {
 		for ( OperationDescription desc : list)
 			if (!action.apply(desc) )
 				return Boolean.FALSE;

@@ -48,7 +48,7 @@ public class FsTest extends TestCase {
 		
 		{
 			ArrayList<OperationDescription> list = new ArrayList<>(1);
-			disApi.discover(o -> {list.add(o);return Boolean.TRUE;});
+			disApi.discover(o -> {list.add(o);return Boolean.TRUE;}, null, null);
 			
 			assertEquals(1, list.size());
 		}
@@ -60,7 +60,7 @@ public class FsTest extends TestCase {
 		disApi.check();
 		{
 			ArrayList<OperationDescription> list = new ArrayList<>(1);
-			disApi.discover(o -> {list.add(o);return Boolean.TRUE;});
+			disApi.discover(o -> {list.add(o);return Boolean.TRUE;}, null, null);
 			
 			assertEquals(0, list.size());
 		}
