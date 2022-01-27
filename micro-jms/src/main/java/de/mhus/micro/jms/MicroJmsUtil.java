@@ -19,6 +19,7 @@ import de.mhus.lib.core.MProperties;
 import de.mhus.lib.core.cfg.CfgLong;
 import de.mhus.lib.core.logging.Log;
 import de.mhus.lib.core.node.INode;
+import de.mhus.lib.core.operation.MutableOperationResult;
 import de.mhus.lib.core.operation.OperationDescription;
 import de.mhus.lib.core.operation.OperationResult;
 import de.mhus.lib.core.util.Version;
@@ -121,7 +122,7 @@ public class MicroJmsUtil {
     
             // Process Answer
             
-            OperationResult out = new OperationResult();
+            MutableOperationResult out = new MutableOperationResult();
             out.setOperationPath(operationName);
             if (answer == null) {
                 log.d(queueName,operationName,"answer is null");

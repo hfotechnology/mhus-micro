@@ -2,7 +2,9 @@ package de.mhus.micro.core.api;
 
 import de.mhus.lib.core.IReadProperties;
 import de.mhus.lib.core.node.INode;
+import de.mhus.lib.core.operation.MutableOperationResult;
 import de.mhus.lib.core.operation.OperationDescription;
+import de.mhus.lib.core.operation.OperationResult;
 
 public class MicroResult {
 
@@ -59,5 +61,14 @@ public class MicroResult {
     @Override
     public String toString() {
         return transportSuccessful + "," + rc + "," + msg + "," + (description != null ? description.getPath() : "?") + "," + result;
+    }
+    
+    public OperationResult adaptToOperationResult() {
+        MutableOperationResult out = new MutableOperationResult(description);
+        out.setSuccessful(transportSuccessful);
+        out.setResultNode(result);
+        out.setMsg(msg);
+        out.setReturnCode(rc);
+        return out;
     }
 }
