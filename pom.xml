@@ -56,10 +56,12 @@
 	</developers>
 	
 	<modules>
+<!--
         <module>micro-core</module>
         <module>micro-jms</module>
         <module>micro-osgi</module>
         <module>micro-karaf</module>
+-->
      </modules>
 
 </project>
